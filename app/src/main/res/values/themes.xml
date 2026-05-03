@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.NextCodeApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="windowSplashScreenBackground">#444444</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    </style>
+</resources>
