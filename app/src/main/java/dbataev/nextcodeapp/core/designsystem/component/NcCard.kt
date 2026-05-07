@@ -95,7 +95,7 @@ fun NextCodeQuoteDropdown(
                         textAlign = TextAlign.End,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 22.dp)
+                            .padding(top = 22.dp, bottom = 8.dp)
                     )
                 }
             } else {
