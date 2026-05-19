@@ -4,12 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import dagger.hilt.android.AndroidEntryPoint
 import dbataev.nextcodeapp.app.navigation.MainScreen
 import dbataev.nextcodeapp.core.data.local.TokenStorage
 import dbataev.nextcodeapp.core.data.remote.RetrofitClient
 import dbataev.nextcodeapp.feature.auth.log.LoginScreen
 import dbataev.nextcodeapp.feature.auth.reg.RegisterScreen
-
+import dbataev.nextcodeapp.feature.lesson.tasks.lessonEnd.LessonEndScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +19,6 @@ class MainActivity : ComponentActivity() {
 
         val tokenStorage = TokenStorage(applicationContext)
         RetrofitClient.init(tokenStorage)
-
 
         setContent {
             MainScreen()

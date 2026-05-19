@@ -1,5 +1,6 @@
 package dbataev.nextcodeapp.core.designsystem.component
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -23,7 +25,9 @@ import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcErrorColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcMainColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 
 @Composable
 fun NextCodeTextField(
@@ -104,4 +108,43 @@ fun NextCodeTextField(
             )
         }
     }
+}
+
+@Composable
+fun NextCodeTextFieldCode(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "Введите ответ...",
+    singleLine: Boolean = false
+) {
+    androidx.compose.material3.OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth(),
+        placeholder = {
+            Text(
+                text = placeholder,
+                color = Color.Gray,
+                style = DefaultAppTextStyles.code
+            )
+        },
+        textStyle = DefaultAppTextStyles.code.copy(
+            color = NcAccentColor
+        ),
+        singleLine = singleLine,
+        minLines = if (singleLine) 1 else 4,
+        maxLines = if (singleLine) 1 else 8,
+        shape = RoundedCornerShape(20.dp),
+        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = NcMainColor,
+            unfocusedContainerColor = NcMainColor,
+            focusedBorderColor = NcSecondAccentColor,
+            unfocusedBorderColor = NcSecondAccentColor,
+            cursorColor = NcAccentColor,
+            focusedTextColor = NcAccentColor,
+            unfocusedTextColor = NcAccentColor
+        )
+    )
 }

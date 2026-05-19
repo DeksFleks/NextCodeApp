@@ -27,7 +27,7 @@ fun TheoryScreen(
     id: Long,
     modifier: Modifier = Modifier,
     viewModel: TheoryViewModel = viewModel(),
-    onStartTest: (TaskDto) -> Unit
+    onStartTask: (TaskDto, ArrayList<TaskDto>) -> Unit
 ) {
     val buttonTexts = listOf("Принято", "Запомню", "Окей", "Продолжить")
     val scrollState = rememberScrollState()
@@ -62,12 +62,11 @@ fun TheoryScreen(
             NextCodeButton(
                 text = buttonTexts.random(),
                 onClick = {
-                    val firstTask = viewModel.tasks.firstOrNull { task ->
-                        task.type == TaskType.TEST
-                    }
+                    val firstTask = viewModel.tasks.firstOrNull()
 
                     if (firstTask != null) {
-                        onStartTest(firstTask)
+                        val remainingTasks = ArrayList(viewModel.tasks.drop(1))
+                        onStartTask(firstTask, remainingTasks)
                     }
                 },
                 modifier = Modifier

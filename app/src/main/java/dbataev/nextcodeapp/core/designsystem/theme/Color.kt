@@ -22,4 +22,5 @@ val NcLinkBetweenLessonColor = Color(0xFFDF8F61)    // Связи между у�
 val NcCourseBlockedColor = Color(0xFF696979)
 val NcCyanColor = Color(0xFF93A6F5)
 val NcErrorColor = Color(0xFFFA0003)
+val NcAccentColorWeak = Color(0xFFE5CAEC)
 

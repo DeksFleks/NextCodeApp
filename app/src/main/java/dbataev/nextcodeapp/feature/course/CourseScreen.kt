@@ -12,16 +12,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dbataev.nextcodeapp.core.data.remote.dto.CourseDto
+import dbataev.nextcodeapp.core.datastore.ContextRepository
 import dbataev.nextcodeapp.core.designsystem.component.NcNullBottomBar
 import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeGrayButton
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.model.Course
+import kotlinx.coroutines.launch
 
 @Composable
 fun CourseScreen(
@@ -29,6 +33,9 @@ fun CourseScreen(
     onCourseClick: (Long) -> Unit
 ) {
     val courses = viewModel.courses
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val repo = remember { ContextRepository(context.applicationContext) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.loadCourses()
@@ -53,13 +60,18 @@ fun CourseScreen(
             courses = courses,
             onCourseClick = { course ->
                 if (course.isActive) {
+
+                    coroutineScope.launch {
+                        repo.saveCourseId(course.id.toInt())
+                    }
+
                     onCourseClick(course.id)
                 }
             },
             modifier = Modifier.weight(1f)
         )
 
-        NcNullBottomBar()
+        NcNullBottomBar(Modifier)
     }
 }
 

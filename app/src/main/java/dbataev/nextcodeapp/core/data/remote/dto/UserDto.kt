@@ -6,5 +6,6 @@ data class UserDto(
     val nickname: String,
     val xp: Int,
     val level: Int,
-    val streak: Int
+    val streak: Int,
+    val courses: CourseDto
 )

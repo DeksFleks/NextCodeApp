@@ -4,8 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,6 +22,7 @@ import dbataev.nextcodeapp.feature.leaderboard.LeaderboardScreen
 import dbataev.nextcodeapp.feature.profile.ProfileScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeTopBar
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
@@ -25,12 +30,14 @@ import dbataev.nextcodeapp.feature.auth.reg.RegisterScreen
 import dbataev.nextcodeapp.feature.course.CourseScreen
 import dbataev.nextcodeapp.feature.auth.SplashScreen
 import dbataev.nextcodeapp.feature.auth.log.LoginScreen
-import dbataev.nextcodeapp.feature.home.HomeViewModel
+import dbataev.nextcodeapp.feature.lesson.tasks.lessonEnd.LessonEndScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.test.TestScreen
 import dbataev.nextcodeapp.feature.lesson.theory.TheoryScreen
+import dbataev.nextcodeapp.feature.lesson.tasks.write.WriteScreen
+
 
 @Composable
-fun MainScreen() {
+fun MainScreen(userViewModel: UserViewModel = viewModel()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -41,6 +48,12 @@ fun MainScreen() {
         Screen.Profile.route
     )
 
+    val user by userViewModel.user.collectAsState()
+
+    LaunchedEffect(Unit) {
+        userViewModel.loadUser()
+    }
+
     val selectedIndex = when (currentRoute) {
         Screen.Home.route -> 0
         Screen.Leaderboard.route -> 1
@@ -49,15 +62,39 @@ fun MainScreen() {
         else -> 0
     }
 
+    fun navigateToTask(task: TaskDto, remainingTasks: ArrayList<TaskDto>) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.set("task", task)
+
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.set("tasks", remainingTasks)
+
+        when (task.type) {
+            dbataev.nextcodeapp.core.common.TaskType.TEST -> {
+                navController.navigate("test")
+            }
+
+            dbataev.nextcodeapp.core.common.TaskType.WRITE -> {
+                navController.navigate("write")
+            }
+
+            else -> {
+                Log.e("NAVIGATE_TO_TASK_DEBUG", "NAVIGATE_TO_TASK_DEBUG")
+            }
+        }
+    }
+
     Scaffold(
         containerColor = NcBackgroundColor,
         topBar = {
             if (shouldShowBars) {
                 NextCodeTopBar(
-                    streak = 3650,
-                    level = 50,
-                    nickname = "developer",
-                    currentXp = 500,
+                    streak = user?.streak ?: 0,
+                    level = user?.level ?: 1,
+                    nickname = user?.nickname ?: "null",
+                    currentXp = user?.xp ?: 0,
                     maxXp = 600,
                     onCourseClick = { navController.navigate("course") }
                 )
@@ -179,12 +216,8 @@ fun MainScreen() {
                 TheoryScreen(
                     theoryText = theoryText,
                     id = lessonId,
-                    onStartTest = { task ->
-                        navController.currentBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("task", task)
-
-                        navController.navigate("test")
+                    onStartTask = { task, remainingTasks ->
+                        navigateToTask(task, remainingTasks)
                     }
                 )
             }
@@ -193,11 +226,73 @@ fun MainScreen() {
                     ?.savedStateHandle
                     ?.get<TaskDto>("task")
 
+                val tasks = navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<ArrayList<TaskDto>>("tasks")
+                    ?: arrayListOf()
+
                 if (task != null) {
-                    TestScreen(task = task)
+                    TestScreen(
+                        task = task,
+                        onTaskComplete = {
+                            val nextTask = tasks.firstOrNull()
+
+                            if (nextTask == null) {
+                                navController.navigate("lesson_end") {
+                                    popUpTo("test") {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            } else {
+                                val remainingTasks = ArrayList(tasks.drop(1))
+                                navigateToTask(nextTask, remainingTasks)
+                            }
+                        }
+                    )
                 } else {
                     Log.e("TEST_DEBUG", "task is null")
                 }
+            }
+
+            composable("write") {
+                val task = navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<TaskDto>("task")
+
+                val tasks = navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<ArrayList<TaskDto>>("tasks")
+                    ?: arrayListOf()
+
+                if (task != null) {
+                    WriteScreen(
+                        task = task,
+                        onTaskComplete = {
+                            val nextTask = tasks.firstOrNull()
+
+                            if (nextTask == null) {
+                                navController.navigate("lesson_end") {
+                                    popUpTo("write") {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            } else {
+                                val remainingTasks = ArrayList(tasks.drop(1))
+                                navigateToTask(nextTask, remainingTasks)
+                            }
+                        }
+                    )
+                } else {
+                    Log.e("WRITE_DEBUG", "task is null")
+                }
+            }
+
+            composable("lesson_end") {
+                LessonEndScreen(
+                    navController = navController
+                )
             }
         }
     }

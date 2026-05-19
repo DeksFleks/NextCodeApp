@@ -23,9 +23,9 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 
 @Composable
-fun NcNullBottomBar() {
+fun NcNullBottomBar(modifier: Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(NcMainColor)
     ) {

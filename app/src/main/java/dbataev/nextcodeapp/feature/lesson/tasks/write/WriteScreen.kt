@@ -1,6 +1,5 @@
-package dbataev.nextcodeapp.feature.lesson.tasks.test
+package dbataev.nextcodeapp.feature.lesson.tasks.write
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,26 +16,18 @@ import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
 import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeMessageCard
-import dbataev.nextcodeapp.core.designsystem.component.NextCodeTestButton
-import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
+import dbataev.nextcodeapp.core.designsystem.component.NextCodeTextFieldCode
 import dbataev.nextcodeapp.feature.lesson.tasks.ExplanationBottomSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestScreen(
+fun WriteScreen(
     task: TaskDto,
     modifier: Modifier = Modifier,
-    viewModel: TestViewModel = viewModel(),
+    viewModel: WriteViewModel = viewModel(),
     onTaskComplete: () -> Unit
 ) {
     val buttonTexts = listOf("Закомитить", "Ответил", "Продолжить", "Готово")
     val scrollState = rememberScrollState()
-    val options = task.options ?: listOf("Кажется", "Что-то", "Сломалось", ":(")
-
-    val selectedAnswers = viewModel.selectedAnswers
-    val showExplanation = viewModel.showExplanation
-
-    val correctAnswers = listOf(task.correctAnswer)
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -57,48 +47,47 @@ fun TestScreen(
                 text = task.question
             )
 
-            options.forEach { option ->
-                NextCodeTestButton(
-                    text = option,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    checked = selectedAnswers.contains(option),
-                    onCheckedChange = { checked ->
-                        viewModel.toggleAnswer(option, checked)
-                    }
-                ) { }
-            }
-        }
+            NextCodeTextFieldCode(
+                value = viewModel.userInput,
+                onValueChange = viewModel::updateInput,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                placeholder = "Введите ответ...",
+                singleLine = false
+            )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(NcSecondColor)
-                .align(Alignment.CenterHorizontally)
-        ) {
             NextCodeButton(
                 text = buttonTexts.random(),
                 onClick = {
                     val isCorrect = viewModel.checkAnswer(task.correctAnswer)
 
                     if (isCorrect) {
+                        viewModel.clearInput()
                         onTaskComplete()
                     } else {
                         viewModel.showExplanation()
                     }
                 },
                 modifier = Modifier
-                    .align(Alignment.Center)
+                    .align(Alignment.CenterHorizontally)
                     .padding(bottom = 12.dp, top = 12.dp)
                     .fillMaxWidth(0.9f),
             ) { }
         }
     }
 
-    if (showExplanation) {
+    if (viewModel.showExplanation) {
         ExplanationBottomSheet(
             explanation = task.explanation,
-            onDismiss = viewModel::hideExplanation,
-            onRetryClick = viewModel::hideExplanation
+            onDismiss = {
+                viewModel.hideExplanation()
+            },
+            onRetryClick = {
+                viewModel.hideExplanation()
+                viewModel.clearInput()
+            }
         )
     }
 }
