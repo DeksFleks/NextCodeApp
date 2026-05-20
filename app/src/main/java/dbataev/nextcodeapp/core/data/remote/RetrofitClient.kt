@@ -13,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    const val BASEURL = "http://192.168.31.249:8080/"
+    const val BASEURL = "http://10.195.90.81:8080/"
     private lateinit var tokenStorage: TokenStorage
 
     fun init(tokenStorage: TokenStorage) {

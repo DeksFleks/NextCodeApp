@@ -1,5 +1,6 @@
 package dbataev.nextcodeapp.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,6 +83,8 @@ fun HomeScreen(
                         title = module.title,
                         lessons = module.lessons,
                         onLessonClick = { lesson ->
+                            Log.d("LESSON_ID_DEBUG", "home clicked lesson.id = ${lesson.id}")
+
                             navController.currentBackStackEntry
                                 ?.savedStateHandle
                                 ?.set("lessonId", lesson.id)

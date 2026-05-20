@@ -77,9 +77,8 @@ fun LessonEndScreen(
             onClick = {
                 navController.navigate(Screen.Home.createRoute(courseId.toLong())) {
                     popUpTo(Screen.Home.route) {
-                        inclusive = false
+                        inclusive = true
                     }
-                    launchSingleTop = true
                 }
             },
             modifier = Modifier

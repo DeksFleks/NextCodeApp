@@ -7,7 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,7 +53,9 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
     )
 
     val user by userViewModel.user.collectAsState()
-    val lessonSessionViewModel: LessonSessionViewModel = viewModel()
+    var currentLessonId by rememberSaveable {
+        mutableLongStateOf(0L)
+    }
 
     LaunchedEffect(Unit) {
         userViewModel.loadUser()
@@ -97,7 +102,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     level = user?.level ?: 1,
                     nickname = user?.nickname ?: "null",
                     currentXp = user?.xp ?: 0,
-                    maxXp = 600,
+                    maxXp = user?.xpForNextLevel ?: 2_147_483_647,
                     onCourseClick = { navController.navigate("course") }
                 )
             }
@@ -209,7 +214,12 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     ?.savedStateHandle
                     ?.get<Long>("lessonId") ?: 0L
 
-                lessonSessionViewModel.setLessonId(lessonId)
+                if (lessonId != 0L) {
+                    currentLessonId = lessonId
+                    Log.d("LESSON_ID_DEBUG", "saved currentLessonId = $currentLessonId")
+                } else {
+                    Log.e("LESSON_ID_DEBUG", "lessonId is 0, currentLessonId not overwritten")
+                }
 
                 val theoryText = navController.previousBackStackEntry
                     ?.savedStateHandle
@@ -219,7 +229,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
 
                 TheoryScreen(
                     theoryText = theoryText,
-                    id = lessonId,
+                    id = if (lessonId != 0L) lessonId else currentLessonId,
                     onStartTask = { task, remainingTasks ->
                         navigateToTask(task, remainingTasks)
                     }
@@ -294,13 +304,14 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
 
             composable("lesson_end") {
-                val lessonId = lessonSessionViewModel.lessonId
+                Log.d("LESSON_ID_DEBUG", "lesson_end currentLessonId = $currentLessonId")
 
                 LessonEndScreen(
                     navController = navController,
-                    lessonId = lessonId,
+                    lessonId = currentLessonId,
                     onCompleted = {
-                        lessonSessionViewModel.clear()
+                        userViewModel.loadUser()
+                        currentLessonId = 0L
                     }
                 )
             }
