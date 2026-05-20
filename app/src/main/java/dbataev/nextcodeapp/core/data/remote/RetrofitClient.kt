@@ -3,6 +3,7 @@ package dbataev.nextcodeapp.core.data.remote
 import dbataev.nextcodeapp.core.data.local.TokenStorage
 import dbataev.nextcodeapp.core.data.remote.api.AuthApi
 import dbataev.nextcodeapp.core.data.remote.api.CourseApi
+import dbataev.nextcodeapp.core.data.remote.api.LessonApi
 import dbataev.nextcodeapp.core.data.remote.api.ModuleApi
 import dbataev.nextcodeapp.core.data.remote.api.QuoteApi
 import dbataev.nextcodeapp.core.data.remote.api.TaskApi
@@ -12,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    const val BASEURL = "http://10.195.90.81:8080/"
+    const val BASEURL = "http://192.168.31.249:8080/"
     private lateinit var tokenStorage: TokenStorage
 
     fun init(tokenStorage: TokenStorage) {
@@ -53,5 +54,9 @@ object RetrofitClient {
 
     val userApi: UserApi by lazy {
         retrofit.create(UserApi::class.java)
+    }
+
+    val lessonApi: LessonApi by lazy {
+        retrofit.create(LessonApi::class.java)
     }
 }

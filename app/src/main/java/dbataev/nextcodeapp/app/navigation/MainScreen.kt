@@ -30,6 +30,7 @@ import dbataev.nextcodeapp.feature.auth.reg.RegisterScreen
 import dbataev.nextcodeapp.feature.course.CourseScreen
 import dbataev.nextcodeapp.feature.auth.SplashScreen
 import dbataev.nextcodeapp.feature.auth.log.LoginScreen
+import dbataev.nextcodeapp.feature.lesson.LessonSessionViewModel
 import dbataev.nextcodeapp.feature.lesson.tasks.lessonEnd.LessonEndScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.test.TestScreen
 import dbataev.nextcodeapp.feature.lesson.theory.TheoryScreen
@@ -49,6 +50,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
     )
 
     val user by userViewModel.user.collectAsState()
+    val lessonSessionViewModel: LessonSessionViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         userViewModel.loadUser()
@@ -207,6 +209,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     ?.savedStateHandle
                     ?.get<Long>("lessonId") ?: 0L
 
+                lessonSessionViewModel.setLessonId(lessonId)
+
                 val theoryText = navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.get<String>("theoryText")
@@ -290,8 +294,14 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
 
             composable("lesson_end") {
+                val lessonId = lessonSessionViewModel.lessonId
+
                 LessonEndScreen(
-                    navController = navController
+                    navController = navController,
+                    lessonId = lessonId,
+                    onCompleted = {
+                        lessonSessionViewModel.clear()
+                    }
                 )
             }
         }
