@@ -23,7 +23,9 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 
 @Composable
-fun NcNullBottomBar(modifier: Modifier) {
+fun NcNullBottomBar(
+    modifier: Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -33,7 +35,8 @@ fun NcNullBottomBar(modifier: Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(24.dp)
-        )
+        ){
+        }
 
         Spacer(
             modifier = Modifier
@@ -44,7 +47,9 @@ fun NcNullBottomBar(modifier: Modifier) {
 }
 
 @Composable
-fun NcNullTopBar(modifier: Modifier) {
+fun NcNullTopBar(
+    modifier: Modifier,
+) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -69,7 +74,8 @@ fun NcNullTopBar(modifier: Modifier) {
                 modifier = modifier
                     .fillMaxWidth()
                     .height(40.dp)
-            )
+            ){
+            }
         }
     }
 }

@@ -23,7 +23,9 @@ data class AppTextStyles(
     val bebasBold48: TextStyle,
     val bebasBold36: TextStyle,
     val bebasBook14: TextStyle,
-    val code: TextStyle
+    val code: TextStyle,
+    val bebasBold20: TextStyle,
+    val bebasRegular20: TextStyle
 ) {}
 
 val DefaultAppTextStyles = AppTextStyles(
@@ -38,6 +40,12 @@ val DefaultAppTextStyles = AppTextStyles(
         fontFamily = BebasNeue,
         fontWeight = FontWeight.W400,
         fontSize = 32.sp
+    ),
+
+    bebasRegular20 = TextStyle(
+        fontFamily = BebasNeue,
+        fontWeight = FontWeight.W400,
+        fontSize = 20.sp
     ),
 
     bigTitle = TextStyle(
@@ -118,6 +126,11 @@ val DefaultAppTextStyles = AppTextStyles(
     ),
     code = TextStyle(
         fontFamily = CourierNew,
+        fontWeight = FontWeight.W700,
+        fontSize = 16.sp
+    ),
+    bebasBold20 = TextStyle(
+        fontFamily = BebasNeue,
         fontWeight = FontWeight.W700,
         fontSize = 20.sp
     )

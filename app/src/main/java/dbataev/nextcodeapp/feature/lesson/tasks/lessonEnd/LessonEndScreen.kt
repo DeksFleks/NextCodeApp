@@ -76,17 +76,16 @@ fun LessonEndScreen(
             text = "git push",
             onClick = {
                 navController.navigate(Screen.Home.createRoute(courseId.toLong())) {
-                    popUpTo(Screen.Home.route) {
+                    popUpTo("lesson_end") {
                         inclusive = true
                     }
+                    launchSingleTop = true
                 }
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 80.dp)
-        ) {
-
-        }
+        ) {}
 
         NcNullBottomBar(
             modifier = Modifier.align(Alignment.BottomCenter)

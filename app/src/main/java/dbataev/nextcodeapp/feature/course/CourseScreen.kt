@@ -61,11 +61,13 @@ fun CourseScreen(
             onCourseClick = { course ->
                 if (course.isActive) {
 
-                    coroutineScope.launch {
-                        repo.saveCourseId(course.id.toInt())
-                    }
+                    viewModel.setCurrentCourse(course.id) {
+                        coroutineScope.launch {
+                            repo.saveCourseId(course.id.toInt())
+                        }
 
-                    onCourseClick(course.id)
+                        onCourseClick(course.id)
+                    }
                 }
             },
             modifier = Modifier.weight(1f)

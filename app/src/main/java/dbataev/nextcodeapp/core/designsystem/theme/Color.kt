@@ -9,6 +9,7 @@ val NcMainColor = Color(0xFF2C2C3B)                 // Доп элементы: 
 val NcSecondColor = Color(0xFF39394B)               // Некоторые карточки
 val NcAccentColor = Color(0xFFF9E5FF)               // Текст, иконки
 val NcSecondAccentColor = Color(0xFFAE00FF)         // Обводка, кнопки
+val NcCodeColor = Color(0xFF0BDC00)
 
 // Доп цвета
 

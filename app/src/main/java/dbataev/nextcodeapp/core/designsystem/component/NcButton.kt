@@ -1,5 +1,6 @@
 package dbataev.nextcodeapp.core.designsystem.component
 
+import android.widget.Button
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
@@ -54,6 +57,7 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 fun NextCodeButton(
     text: String,
     modifier: Modifier = Modifier,
+    colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = NcSecondAccentColor),
     onClick: () -> Unit,
     function: () -> Unit
 ) {
@@ -67,7 +71,7 @@ fun NextCodeButton(
                 .fillMaxSize(),
             onClick = onClick,
             shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NcSecondAccentColor),
+            colors = colors,
             contentPadding = PaddingValues(10.dp)
         ) {
             Text(
@@ -297,6 +301,53 @@ fun NextCodeLessonButton(
             )
         }
 
+    }
+}
+
+
+@Composable
+fun NextCodeSettingButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = NcSecondColor.copy(alpha = 0f)),
+    ){
+        Icon(
+            painter = painterResource(R.drawable.ic_settings),
+            contentDescription = null,
+            tint = NcAccentColor,
+            modifier = Modifier
+                .size(28.dp)
+        )
+    }
+}
+
+@Composable
+fun NextCodeBackButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = NcSecondColor.copy(alpha = 0f)
+        )
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_down),
+            contentDescription = null,
+            tint = NcAccentColor,
+            modifier = Modifier
+                .size(28.dp)
+                .rotate(90f)
+        )
     }
 }
 

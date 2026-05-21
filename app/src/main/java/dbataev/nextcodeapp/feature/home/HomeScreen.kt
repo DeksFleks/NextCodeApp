@@ -28,6 +28,7 @@ import dbataev.nextcodeapp.core.designsystem.component.NextCodeModulesTitles
 import dbataev.nextcodeapp.feature.module.ModuleViewModel
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
+import dbataev.nextcodeapp.core.common.LessonState
 
 @Composable
 fun HomeScreen(
@@ -83,17 +84,19 @@ fun HomeScreen(
                         title = module.title,
                         lessons = module.lessons,
                         onLessonClick = { lesson ->
-                            Log.d("LESSON_ID_DEBUG", "home clicked lesson.id = ${lesson.id}")
+                            if (lesson.state != LessonState.BLOCKED) {
+                                Log.d("LESSON_ID_DEBUG", "home clicked lesson.id = ${lesson.id}")
 
-                            navController.currentBackStackEntry
-                                ?.savedStateHandle
-                                ?.set("lessonId", lesson.id)
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("lessonId", lesson.id)
 
-                            navController.currentBackStackEntry
-                                ?.savedStateHandle
-                                ?.set("theoryText", lesson.theoryText)
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("theoryText", lesson.theoryText)
 
-                            navController.navigate("theory")
+                                navController.navigate("theory")
+                            }
                         }
                     )
                 }

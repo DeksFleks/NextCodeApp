@@ -86,7 +86,6 @@ fun WriteScreen(
             },
             onRetryClick = {
                 viewModel.hideExplanation()
-                viewModel.clearInput()
             }
         )
     }

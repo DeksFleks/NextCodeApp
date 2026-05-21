@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,12 +34,19 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.R
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcCodeColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcMainColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
@@ -195,11 +203,95 @@ fun NextCodeMessageCard(
             }
 
             Text(
-                text = text,
+                text = parseNextCodeText(text),
                 color = NcAccentColor,
-                // style = DefaultAppTextStyles.bebasBookXP,
                 modifier = Modifier.padding(horizontal = 2.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun NextCodeStatisticsProfileCard(
+    statistics: String,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .padding(vertical = 8.dp, horizontal = 8.dp)
+            .height(80.dp)
+            .background(NcMainColor,
+                RoundedCornerShape(16.dp)),
+        contentAlignment = Alignment.Center
+    ){
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = statistics,
+                color = NcAccentColor,
+                style = DefaultAppTextStyles.bebasBold36
+            )
+
+            Text(
+                text = text,
+                color = NcAccentColor,
+                style = DefaultAppTextStyles.bebasRegular32
+            )
+        }
+    }
+}
+
+
+fun parseNextCodeText(input: String): AnnotatedString {
+    return buildAnnotatedString {
+        var i = 0
+
+        while (i < input.length) {
+            when {
+                input.startsWith("**", i) -> {
+                    val end = input.indexOf("**", startIndex = i + 2)
+
+                    if (end != -1) {
+                        withStyle(
+                            SpanStyle(fontWeight = FontWeight.Bold)
+                        ) {
+                            append(input.substring(i + 2, end))
+                        }
+                        i = end + 2
+                    } else {
+                        append(input[i])
+                        i++
+                    }
+                }
+
+                input[i] == '`' -> {
+                    val end = input.indexOf('`', startIndex = i + 1)
+
+                    if (end != -1) {
+                        withStyle(
+                            SpanStyle(
+                                fontFamily = FontFamily.Monospace,
+                                background = NcSecondColor,
+                                color = NcCodeColor
+                            )
+                        ) {
+                            append(input.substring(i + 1, end))
+                        }
+                        i = end + 1
+                    } else {
+                        append(input[i])
+                        i++
+                    }
+                }
+
+                else -> {
+                    append(input[i])
+                    i++
+                }
+            }
         }
     }
 }

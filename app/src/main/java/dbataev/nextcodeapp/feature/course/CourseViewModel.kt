@@ -14,6 +14,9 @@ class CourseViewModel : ViewModel() {
     var courses by mutableStateOf<List<CourseDto>>(emptyList())
         private set
 
+    var isCourseSaving by mutableStateOf(false)
+        private set
+
     fun loadCourses() {
         viewModelScope.launch {
             try {
@@ -26,6 +29,27 @@ class CourseViewModel : ViewModel() {
                 courses = result
             } catch (e: Exception) {
                 Log.e("CourseViewModel", "loadCourses failed", e)
+            }
+        }
+    }
+
+    fun setCurrentCourse(
+        courseId: Long,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                isCourseSaving = true
+
+                RetrofitClient.userApi.setCurrentCourse(courseId)
+
+                Log.d("CourseViewModel", "course selected: $courseId")
+
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e("CourseViewModel", "setCurrentCourse failed", e)
+            } finally {
+                isCourseSaving = false
             }
         }
     }

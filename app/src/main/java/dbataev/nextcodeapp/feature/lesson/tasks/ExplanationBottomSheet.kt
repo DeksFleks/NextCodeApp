@@ -20,14 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.R
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
+import dbataev.nextcodeapp.core.designsystem.component.parseNextCodeText
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColorWeak
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcCodeColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,15 +91,14 @@ fun ExplanationBottomSheet(
                     Column() {
                         Text(
                             text = "Пояснение к заданию",
-                            style = DefaultAppTextStyles.bebasRegular32,
+                            style = DefaultAppTextStyles.bebasBook20,
                             color = NcAccentColor
                         )
 
                         Text(
-                            text = explanation
-                                ?: "Похоже пояснение не загрузилось, как видишь даже разработчик приложения по программированию может ошибиться, попробуй еще раз",
-                            style = DefaultAppTextStyles.bebasBook24,
-                            color = NcAccentColorWeak
+                            text = parseNextCodeText(explanation ?: "Ответ неверный. Попробуй ещё раз."),
+                            color = NcAccentColor,
+                            modifier = Modifier.padding(horizontal = 2.dp)
                         )
                     }
                 }

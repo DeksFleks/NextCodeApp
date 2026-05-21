@@ -45,7 +45,7 @@ fun NextCodeProgressTopbar(
                     .offset(y = 6.dp),
                 text = "$level LVL",
                 color = NcAccentColor,
-                style = DefaultAppTextStyles.bebasBold24
+                style = DefaultAppTextStyles.bebasBold20
             )
 
             Text(
@@ -53,7 +53,7 @@ fun NextCodeProgressTopbar(
                     .offset(y = 6.dp),
                 text = nickname.uppercase(),
                 color = NcAccentColor,
-                style = DefaultAppTextStyles.bebasRegular24
+                style = DefaultAppTextStyles.bebasRegular20
             )
         }
 

@@ -8,11 +8,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,11 +31,11 @@ import dbataev.nextcodeapp.feature.auth.reg.RegisterScreen
 import dbataev.nextcodeapp.feature.course.CourseScreen
 import dbataev.nextcodeapp.feature.auth.SplashScreen
 import dbataev.nextcodeapp.feature.auth.log.LoginScreen
-import dbataev.nextcodeapp.feature.lesson.LessonSessionViewModel
 import dbataev.nextcodeapp.feature.lesson.tasks.lessonEnd.LessonEndScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.test.TestScreen
 import dbataev.nextcodeapp.feature.lesson.theory.TheoryScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.write.WriteScreen
+import dbataev.nextcodeapp.feature.setting.SettingScreen
 
 
 @Composable
@@ -152,10 +150,12 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
             composable(Screen.Leaderboard.route) { LeaderboardScreen() }
             composable(Screen.Achievements.route) { AchievementsScreen() }
-            composable(Screen.Profile.route) { ProfileScreen() }
+            composable(Screen.Profile.route) { ProfileScreen(navController = navController) }
             composable(Screen.Course.route) {
                 CourseScreen(
                     onCourseClick = { courseId ->
+                        userViewModel.loadUser()
+
                         navController.navigate(Screen.Home.createRoute(courseId)) {
                             popUpTo(Screen.Course.route) {
                                 inclusive = true
@@ -314,6 +314,10 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                         currentLessonId = 0L
                     }
                 )
+            }
+
+            composable("settings") {
+                SettingScreen(navController = navController)
             }
         }
     }
