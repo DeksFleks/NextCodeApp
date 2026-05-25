@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import dbataev.nextcodeapp.app.navigation.Screen
+import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 import dbataev.nextcodeapp.core.data.local.TokenStorage
 import dbataev.nextcodeapp.core.designsystem.component.NcNullBottomBar
 import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
@@ -33,7 +34,8 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcErrorColor
 @Composable
 fun SettingScreen(
     navController: NavHostController,
-    settingViewModel: SettingViewModel = viewModel()
+    settingViewModel: SettingViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel()
 ) {
     val context = LocalContext.current
 
@@ -115,11 +117,11 @@ fun SettingScreen(
                     containerColor = NcErrorColor
                 ),
                 onClick = {
-                    TokenStorage(context).clearToken()
+                            TokenStorage(context).clearToken()
 
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) {
-                            inclusive = true
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) {
+                                    inclusive = true
                         }
                         launchSingleTop = true
                     }
@@ -143,7 +145,12 @@ fun SettingScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
                 onClick = {
-                    settingViewModel.updateUser()
+                    settingViewModel.updateUser(
+                        onSuccess = {
+                            userViewModel.loadUser()
+                            navController.popBackStack()
+                        }
+                    )
                 }
             ) { }
         }

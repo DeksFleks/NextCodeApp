@@ -16,17 +16,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import dbataev.nextcodeapp.R
 import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
-import dbataev.nextcodeapp.core.designsystem.component.NcBackgroundText
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeSettingButton
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeStatisticsProfileCard
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
@@ -36,7 +32,7 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel
 ) {
     val user by userViewModel.user.collectAsState()
 
@@ -103,7 +99,7 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             NextCodeStatisticsProfileCard(
-                statistics = user?.xp.toString(),
+                statistics = user?.totalXp.toString(),
                 text = "XP",
                 modifier = Modifier.weight(1f),
             )

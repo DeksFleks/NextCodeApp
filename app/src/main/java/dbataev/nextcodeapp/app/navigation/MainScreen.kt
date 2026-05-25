@@ -150,7 +150,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
             composable(Screen.Leaderboard.route) { LeaderboardScreen() }
             composable(Screen.Achievements.route) { AchievementsScreen() }
-            composable(Screen.Profile.route) { ProfileScreen(navController = navController) }
+            composable(Screen.Profile.route) { ProfileScreen(navController = navController, userViewModel = userViewModel
+            ) }
             composable(Screen.Course.route) {
                 CourseScreen(
                     onCourseClick = { courseId ->
@@ -174,6 +175,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     onRegisterSuccess = {
                         Log.d("REGISTER_DEBUG", "ON SUCCESS CALLED")
 
+                        userViewModel.loadUser()
+
                         navController.navigate(Screen.Course.route) {
                             popUpTo(Screen.Register.route) {
                                 inclusive = true
@@ -192,6 +195,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             composable("login") {
                 LoginScreen(
                     onLoginSuccess = {
+                        userViewModel.loadUser()
+
                         navController.navigate(Screen.Home.createRoute(1L)) {
                             popUpTo("login") {
                                 inclusive = true
@@ -317,7 +322,10 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
 
             composable("settings") {
-                SettingScreen(navController = navController)
+                SettingScreen(
+                    navController = navController,
+                    userViewModel = userViewModel
+                )
             }
         }
     }

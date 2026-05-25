@@ -8,5 +8,6 @@ data class UserDto(
     val level: Int,
     val streak: Int,
     val xpForNextLevel: Int,
-    val courses: CourseDto
+    val courses: CourseDto,
+    val totalXp: Long
 )
