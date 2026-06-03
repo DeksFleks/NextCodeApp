@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -43,13 +41,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.R
+import dbataev.nextcodeapp.core.data.remote.dto.AchievementDto
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcCodeColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcMainColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcThirdAccentColor
 
 @Composable
 fun NextCodeQuoteDropdown(
@@ -174,7 +175,8 @@ fun NextCodeMessageCard(
                 .padding(start = 16.dp, end = 16.dp, bottom = 20.dp)
         ) {
             Row(
-                modifier = Modifier.padding(top = 10.dp)
+                modifier = Modifier
+                    .padding(top = 10.dp)
                     .offset(x = -30.dp, y = -10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -215,20 +217,64 @@ fun NextCodeMessageCard(
 fun NextCodeStatisticsProfileCard(
     statistics: String,
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    icon: Int = R.drawable.ic_lvl_icon
 ) {
+    val shape = RoundedCornerShape(16.dp)
+
     Box(
         modifier = modifier
-            .padding(vertical = 8.dp, horizontal = 8.dp)
-            .height(80.dp)
-            .background(NcMainColor,
-                RoundedCornerShape(16.dp)),
+            .padding(vertical = 8.dp, horizontal = 4.dp)
+            .height(140.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF3A344A),
+                        Color(0xFF2C2C3B),
+                        Color(0xFF1F1F2B)
+                    )
+                ),
+                shape = shape
+            )
+            .border(
+                width = 2.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        NcThirdAccentColor,
+                        Color(0xFF6A00FF)
+                    )
+                ),
+                shape = shape
+            ),
         contentAlignment = Alignment.Center
-    ){
+    ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            NcThirdAccentColor.copy(alpha = 0.14f),
+                            Color.Transparent
+                        )
+                    ),
+                    shape = shape
+                )
+        )
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = null,
+                tint = Color(0xFF9B2DFF),
+                modifier = Modifier
+                    .size(60.dp)
+                    .offset(y = -6.dp)
+            )
+
             Text(
                 text = statistics,
                 color = NcAccentColor,
@@ -237,13 +283,76 @@ fun NextCodeStatisticsProfileCard(
 
             Text(
                 text = text,
-                color = NcAccentColor,
-                style = DefaultAppTextStyles.bebasRegular32
+                color = NcCourseBlockedColor,
+                style = DefaultAppTextStyles.bebasRegular20
             )
         }
     }
 }
 
+@Composable
+fun NextCodeAchievementCard(
+    modifier: Modifier = Modifier,
+    achievement: AchievementDto,
+) {
+    val shape = RoundedCornerShape(16.dp)
+
+    Box(modifier = modifier
+        .fillMaxWidth(1f)
+        .background(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFF3A344A),
+                    Color(0xFF2C2C3B),
+                    Color(0xFF1F1F2B)
+                )
+            ),
+            shape = shape
+        )
+        .border(
+            width = 2.dp,
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    NcThirdAccentColor,
+                    Color(0xFF6A00FF)
+                )
+            ),
+            shape = shape
+        )
+    ) {
+        Row(
+            Modifier.padding(5.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_achievement_bg),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(90.dp)
+            )
+            Column(
+                Modifier.padding(vertical = 20.dp)
+            ) {
+                Text(
+                    text = achievement.title,
+                    style = DefaultAppTextStyles.bebasRegular24,
+                    color = NcAccentColor
+                )
+
+                Text(
+                    text = achievement.description,
+                    style = DefaultAppTextStyles.bebasBook20,
+                    color = NcCourseBlockedColor
+                )
+
+                Text(
+                    text = "Тут будет прогресс",
+                    style = DefaultAppTextStyles.bebasBook14,
+                    color = NcCourseBlockedColor
+                )
+            }
+        }
+    }
+}
 
 fun parseNextCodeText(input: String): AnnotatedString {
     return buildAnnotatedString {

@@ -9,5 +9,6 @@ data class UserDto(
     val streak: Int,
     val xpForNextLevel: Int,
     val courses: CourseDto,
-    val totalXp: Long
+    val totalXp: Long,
+    val bestStreak: Long
 )

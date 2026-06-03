@@ -8,7 +8,8 @@ val NcBackgroundColor = Color(0xFF1D1D26)           // Фон
 val NcMainColor = Color(0xFF2C2C3B)                 // Доп элементы: бар, некоторые карточки
 val NcSecondColor = Color(0xFF39394B)               // Некоторые карточки
 val NcAccentColor = Color(0xFFF9E5FF)               // Текст, иконки
-val NcSecondAccentColor = Color(0xFFAE00FF)         // Обводка, кнопки
+val NcSecondAccentColor = Color(0xFFB300FF)         // Обводка, кнопки
+val NcThirdAccentColor = Color(0xFF7200E3)          // Подсказки
 val NcCodeColor = Color(0xFF0BDC00)
 
 // Доп цвета

@@ -28,6 +28,8 @@ import dbataev.nextcodeapp.core.designsystem.component.NextCodeStatisticsProfile
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcLessonBlockedColor
 
 @Composable
 fun ProfileScreen(
@@ -100,20 +102,33 @@ fun ProfileScreen(
         ) {
             NextCodeStatisticsProfileCard(
                 statistics = user?.totalXp.toString(),
-                text = "XP",
+                text = "TOTAL XP",
                 modifier = Modifier.weight(1f),
+                icon = R.drawable.ic_xp_icon
             )
 
             NextCodeStatisticsProfileCard(
-                statistics = user?.streak.toString(),
-                text = "Streak",
+                statistics = user?.bestStreak.toString(),
+                text = "Best Streak",
                 modifier = Modifier.weight(1f),
+                icon = R.drawable.ic_target
             )
 
             NextCodeStatisticsProfileCard(
                 statistics = user?.level.toString(),
                 text = "Level",
                 modifier = Modifier.weight(1f),
+                icon = R.drawable.ic_lvl_icon
+            )
+        }
+
+        Box(
+            Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = "Достижения",
+                style = DefaultAppTextStyles.bebasBold24,
+                color = NcCourseBlockedColor
             )
         }
     }

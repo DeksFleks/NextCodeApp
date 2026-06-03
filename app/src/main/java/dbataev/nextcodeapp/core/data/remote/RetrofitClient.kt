@@ -1,6 +1,7 @@
 package dbataev.nextcodeapp.core.data.remote
 
 import dbataev.nextcodeapp.core.data.local.TokenStorage
+import dbataev.nextcodeapp.core.data.remote.api.AchievementApi
 import dbataev.nextcodeapp.core.data.remote.api.AuthApi
 import dbataev.nextcodeapp.core.data.remote.api.CourseApi
 import dbataev.nextcodeapp.core.data.remote.api.LessonApi
@@ -58,5 +59,9 @@ object RetrofitClient {
 
     val lessonApi: LessonApi by lazy {
         retrofit.create(LessonApi::class.java)
+    }
+
+    val achievementApi: AchievementApi by lazy {
+        retrofit.create(AchievementApi::class.java)
     }
 }
