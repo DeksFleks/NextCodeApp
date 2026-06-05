@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,7 +28,6 @@ import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
-import dbataev.nextcodeapp.core.designsystem.theme.NcLessonBlockedColor
 
 @Composable
 fun ProfileScreen(
@@ -115,8 +113,8 @@ fun ProfileScreen(
             )
 
             NextCodeStatisticsProfileCard(
-                statistics = user?.level.toString(),
-                text = "Level",
+                statistics = user?.completedLessons.toString(),
+                text = "Total Lessons",
                 modifier = Modifier.weight(1f),
                 icon = R.drawable.ic_lvl_icon
             )

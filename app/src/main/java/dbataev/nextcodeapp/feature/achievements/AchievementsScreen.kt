@@ -8,23 +8,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dbataev.nextcodeapp.core.data.remote.dto.AchievementDto
 import dbataev.nextcodeapp.core.designsystem.component.NcBackgroundText
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeAchievementCard
-import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
-import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun AchievementsScreen(
     viewModel: AchievementViewModel = viewModel(),
 ) {
-    viewModel.loadAchievement()
+    LaunchedEffect(Unit) {
+        viewModel.loadAchievement()
+    }
+
     val achievements = viewModel.achievements
 
     Box(

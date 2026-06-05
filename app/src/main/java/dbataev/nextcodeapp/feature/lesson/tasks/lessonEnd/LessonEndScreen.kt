@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import dbataev.nextcodeapp.app.navigation.Screen
+import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 import dbataev.nextcodeapp.core.datastore.ContextRepository
 import dbataev.nextcodeapp.core.designsystem.component.NcBackgroundText
 import dbataev.nextcodeapp.core.designsystem.component.NcNullBottomBar
@@ -35,7 +36,8 @@ fun LessonEndScreen(
     navController: NavController,
     lessonId: Long,
     onCompleted: () -> Unit,
-    viewModel: LessonEndViewModel = viewModel()
+    viewModel: LessonEndViewModel = viewModel(),
+    userViewModel: UserViewModel,
 ) {
     val context = LocalContext.current
     val repo = remember { ContextRepository(context.applicationContext) }
@@ -50,6 +52,7 @@ fun LessonEndScreen(
 
     LaunchedEffect(isCompleted) {
         if (isCompleted) {
+            userViewModel.loadUser()
             onCompleted()
         }
     }

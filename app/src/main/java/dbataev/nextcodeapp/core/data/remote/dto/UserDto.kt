@@ -10,5 +10,6 @@ data class UserDto(
     val xpForNextLevel: Int,
     val courses: CourseDto,
     val totalXp: Long,
-    val bestStreak: Long
+    val bestStreak: Long,
+    val completedLessons: Long,
 )

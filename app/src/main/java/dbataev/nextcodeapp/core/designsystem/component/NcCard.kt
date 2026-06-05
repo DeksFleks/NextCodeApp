@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,16 +61,24 @@ fun NextCodeQuoteDropdown(
     onCollapsed: () -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
+
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
         label = "quote_rotation"
     )
 
+    LaunchedEffect(expanded) {
+        if (!expanded) {
+            kotlinx.coroutines.delay(100)
+            onCollapsed()
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .padding(bottom = 16.dp, top = 8.dp) // Отступ под цитатой
+            .padding(bottom = 16.dp, top = 8.dp)
             .animateContentSize()
     ) {
         Box(
@@ -77,7 +86,9 @@ fun NextCodeQuoteDropdown(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(28.dp))
                 .background(NcSecondColor)
-                .clickable { expanded = !expanded }
+                .clickable {
+                    expanded = !expanded
+                }
                 .padding(
                     start = 28.dp,
                     top = if (expanded) 24.dp else 0.dp,
@@ -108,7 +119,6 @@ fun NextCodeQuoteDropdown(
                     )
                 }
             } else {
-                onCollapsed()
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -129,7 +139,9 @@ fun NextCodeQuoteDropdown(
                 color = NcBackgroundColor,
                 shape = RoundedCornerShape(14.dp)
             )
-            .clickable { expanded = !expanded },
+            .clickable {
+                expanded = !expanded
+            },
         contentAlignment = Alignment.Center
     ) {
         Icon(

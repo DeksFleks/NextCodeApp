@@ -314,8 +314,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 LessonEndScreen(
                     navController = navController,
                     lessonId = currentLessonId,
+                    userViewModel = userViewModel,
                     onCompleted = {
-                        userViewModel.loadUser()
                         currentLessonId = 0L
                     }
                 )
