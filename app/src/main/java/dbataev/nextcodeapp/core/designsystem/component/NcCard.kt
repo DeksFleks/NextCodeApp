@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -22,10 +24,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.toInt
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,20 +42,34 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.R
+import dbataev.nextcodeapp.core.common.AchievementType
+import dbataev.nextcodeapp.core.common.LevelAchievementType
+import dbataev.nextcodeapp.core.common.parsers.ProgrammingLanguage
+import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 import dbataev.nextcodeapp.core.data.remote.dto.AchievementDto
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
-import dbataev.nextcodeapp.core.designsystem.theme.NcCodeColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcCodeCardColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcMainColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcStringCodeColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcThirdAccentColor
+import dbataev.nextcodeapp.core.designsystem.theme.NextCodeTextPart
+import android.content.ClipData
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
+import kotlinx.coroutines.launch
 
 @Composable
 fun NextCodeQuoteDropdown(
@@ -162,7 +180,7 @@ fun NextCodeMessageCard(
 ) {
     Box(
         modifier = modifier
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 8.dp, horizontal = 12.dp)
     ) {
         // 1. Слой карточки: фон + бордер
         Box(
@@ -192,6 +210,8 @@ fun NextCodeMessageCard(
                     .offset(x = -30.dp, y = -10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_ai_mask_icon),
                     contentDescription = null,
@@ -216,9 +236,8 @@ fun NextCodeMessageCard(
                 )
             }
 
-            Text(
-                text = parseNextCodeText(text),
-                color = NcAccentColor,
+            NextCodeRichText(
+                text = text,
                 modifier = Modifier.padding(horizontal = 2.dp)
             )
         }
@@ -306,67 +325,268 @@ fun NextCodeStatisticsProfileCard(
 fun NextCodeAchievementCard(
     modifier: Modifier = Modifier,
     achievement: AchievementDto,
+    userViewModel: UserViewModel
 ) {
     val shape = RoundedCornerShape(16.dp)
+    val user by userViewModel.user.collectAsState()
 
-    Box(modifier = modifier
-        .fillMaxWidth(1f)
-        .background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF3A344A),
-                    Color(0xFF2C2C3B),
-                    Color(0xFF1F1F2B)
-                )
-            ),
-            shape = shape
-        )
-        .border(
-            width = 2.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    NcThirdAccentColor,
-                    Color(0xFF6A00FF)
-                )
-            ),
-            shape = shape
-        )
+    var bgRes = when (achievement.levelType) {
+        LevelAchievementType.BRONZE -> R.drawable.ic_achievement_bg_bronze
+        LevelAchievementType.SILVER -> R.drawable.ic_achievement_bg_silver
+        LevelAchievementType.GOLD -> R.drawable.ic_achievement_bg_gold
+        LevelAchievementType.AMETHYST -> R.drawable.ic_achievement_bg_amethyst
+    }
+
+    var iconRes = when (achievement.type) {
+        AchievementType.LESSONS_COMPLETED -> R.drawable.ic_lesson_ach_icon
+        AchievementType.STREAK_DAYS -> R.drawable.ic_streak
+        else -> {
+            R.drawable.ic_course
+        }
+    }
+
+    val currentProgress = when (achievement.type) {
+        AchievementType.LESSONS_COMPLETED -> user?.completedLessons ?: 0
+        // AchievementType.COURSES_COMPLETED -> user?.completedCourses ?: 0
+        AchievementType.XP_EARNED -> user?.totalXp ?: 0
+        AchievementType.LEVEL_REACHED -> user?.level ?: 1
+        AchievementType.STREAK_DAYS -> user?.bestStreak ?: 0
+        // AchievementType.DAILY_COMPLETED -> user?.completedDailyTasks ?: 0
+        // AchievementType.TASKS_COMPLETED -> user?.completedTasks ?: 0
+        else -> {
+            0
+        }
+    }
+
+    val isNotCompleted = achievement.conditionValue > currentProgress.toInt()
+
+    if (isNotCompleted) {
+        bgRes = R.drawable.ic_achievement_bg_locked
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF3A344A),
+                        Color(0xFF2C2C3B),
+                        Color(0xFF1F1F2B)
+                    )
+                ),
+                shape = shape
+            )
+            .border(
+                width = 2.dp,
+                brush = Brush.linearGradient(
+                    colors =
+                        (if (!isNotCompleted) {
+                            listOf(
+                                NcThirdAccentColor,
+                                Color(0xFF6A00FF)
+                            )
+                        } else {
+                            listOf(
+                                NcMainColor,
+                                NcSecondColor
+                            )
+                        }) as List<Color>
+                ),
+                shape = shape
+            )
     ) {
         Row(
-            Modifier.padding(5.dp)
+            Modifier
+                .padding(5.dp)
+                .height(90.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_achievement_bg),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
-                    .size(90.dp)
-            )
-            Column(
-                Modifier.padding(vertical = 20.dp)
+                    .size(75.dp)
+                    .align(Alignment.CenterVertically),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = achievement.title,
-                    style = DefaultAppTextStyles.bebasRegular24,
-                    color = NcAccentColor
+                Image(
+                    painter = painterResource(id = bgRes),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize()
                 )
 
-                Text(
-                    text = achievement.description,
-                    style = DefaultAppTextStyles.bebasBook20,
-                    color = NcCourseBlockedColor
-                )
+                if (!isNotCompleted) {
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = null,
+                        tint = NcAccentColor,
+                        modifier = Modifier.size(38.dp)
+                    )
+                }
+            }
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                ) {
+                    Column() {
+                        Text(
+                            text = achievement.title,
+                            style = DefaultAppTextStyles.bebasRegular20,
+                            maxLines = 2,
+                            color = NcAccentColor
+                        )
 
-                Text(
-                    text = "Тут будет прогресс",
-                    style = DefaultAppTextStyles.bebasBook14,
-                    color = NcCourseBlockedColor
+                        Text(
+                            text = achievement.description,
+                            style = DefaultAppTextStyles.bebasBook16,
+                            maxLines = 2,
+                            color = NcCourseBlockedColor
+                        )
+                    }
+                }
+
+                NextCodeAchievementsProgressBar(
+                    current = currentProgress.toInt(),
+                    max = achievement.conditionValue,
                 )
             }
         }
     }
 }
 
-fun parseNextCodeText(input: String): AnnotatedString {
+@Composable
+fun NextCodeCodeBlock(
+    code: String,
+    modifier: Modifier = Modifier,
+    language: String = "text",
+    showHeader: Boolean = false,
+    showCopyButton: Boolean = false
+) {
+    val normalizedLanguage = language.trim().lowercase()
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    val horizontalScrollState = rememberScrollState()
+
+    val codeText = remember(code, normalizedLanguage) {
+        when (normalizedLanguage) {
+            "java" -> ProgrammingLanguage.highlightJavaCode(code)
+            else -> AnnotatedString(code)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = NcCodeCardColor,
+                shape = RoundedCornerShape(16.dp)
+            )
+    //         .padding(horizontal = 4.dp, vertical = 4.dp)
+    ) {
+        Column {
+            if (showHeader) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = NcBackgroundColor,
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                topEnd = 16.dp
+                            )
+                        )
+                        .padding(horizontal = 16.dp, vertical = 1.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = language.trim().uppercase(),
+                        color = NcAccentColor,
+                        style = DefaultAppTextStyles.code,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (showCopyButton) {
+                        NextCodeCopyButton {
+                            coroutineScope.launch {
+                                val clipData = ClipData.newPlainText(
+                                    "NextCode code",
+                                    code
+                                )
+
+                                clipboard.setClipEntry(
+                                    ClipEntry(clipData)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(horizontalScrollState)
+            ) {
+                Text(
+                    text = codeText,
+                    color = NcAccentColor,
+                    style = DefaultAppTextStyles.code,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NextCodeRichText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    val parts = remember(text) {
+        parseNextCodeTextParts(text)
+    }
+
+    Column(
+        modifier = modifier
+    ) {
+        parts.forEach { part ->
+            when (part) {
+                is NextCodeTextPart.TextPart -> {
+                    if (part.text.isNotBlank()) {
+                        Text(
+                            text = parseNextCodeInlineText(part.text),
+                            color = NcAccentColor,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
+                    }
+                }
+
+                is NextCodeTextPart.CodeBlock -> {
+                    NextCodeCodeBlock(
+                        code = part.code,
+                        language = part.language,
+                        showHeader = true,
+                        showCopyButton = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    //      .padding(vertical = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun parseNextCodeInlineText(input: String): AnnotatedString {
     return buildAnnotatedString {
         var i = 0
 
@@ -392,15 +612,17 @@ fun parseNextCodeText(input: String): AnnotatedString {
                     val end = input.indexOf('`', startIndex = i + 1)
 
                     if (end != -1) {
+                        val codeText = input.substring(i + 1, end)
+
                         withStyle(
                             SpanStyle(
                                 fontFamily = FontFamily.Monospace,
-                                background = NcSecondColor,
-                                color = NcCodeColor
+                                background = NcSecondColor
                             )
                         ) {
-                            append(input.substring(i + 1, end))
+                            append(ProgrammingLanguage.highlightJavaCode(codeText))
                         }
+
                         i = end + 1
                     } else {
                         append(input[i])
@@ -415,6 +637,71 @@ fun parseNextCodeText(input: String): AnnotatedString {
             }
         }
     }
+}
+fun parseNextCodeTextParts(input: String): List<NextCodeTextPart> {
+    val parts = mutableListOf<NextCodeTextPart>()
+
+    var i = 0
+
+    while (i < input.length) {
+        val blockStart = input.indexOf("```", startIndex = i)
+
+        if (blockStart == -1) {
+            if (i < input.length) {
+                parts.add(NextCodeTextPart.TextPart(input.substring(i)))
+            }
+            break
+        }
+
+        if (blockStart > i) {
+            parts.add(
+                NextCodeTextPart.TextPart(
+                    input.substring(i, blockStart)
+                )
+            )
+        }
+
+        val contentStart = blockStart + 3
+        val blockEnd = input.indexOf("```", startIndex = contentStart)
+
+        if (blockEnd == -1) {
+            parts.add(
+                NextCodeTextPart.TextPart(
+                    input.substring(blockStart)
+                )
+            )
+            break
+        }
+
+        val rawBlock = input.substring(contentStart, blockEnd)
+            .removePrefix("\n")
+            .trimEnd('\n', '\r')
+
+        val lines = rawBlock.lines()
+
+        val language = lines
+            .firstOrNull()
+            ?.trim()
+            ?.ifBlank { "text" }
+            ?: "text"
+
+        val code = if (lines.size > 1) {
+            lines.drop(1).joinToString("\n")
+        } else {
+            ""
+        }
+
+        parts.add(
+            NextCodeTextPart.CodeBlock(
+                code = code,
+                language = language
+            )
+        )
+
+        i = blockEnd + 3
+    }
+
+    return parts
 }
 
 

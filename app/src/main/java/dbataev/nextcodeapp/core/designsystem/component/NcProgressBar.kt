@@ -13,16 +13,21 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.GenericShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcThirdAccentColor
 
 @Composable
 fun NextCodeProgressTopbar(
@@ -110,5 +115,97 @@ fun NextCodeXpBar(
             color = NcAccentColor,
             style = DefaultAppTextStyles.bebasBookXP
         )
+    }
+}
+
+@Composable
+fun NextCodeAchievementsProgressBar(
+    current: Int,
+    max: Int,
+    modifier: Modifier = Modifier
+) {
+    val progress = if (max <= 0) {
+        0f
+    } else {
+        (current.toFloat() / max.toFloat()).coerceIn(0f, 1f)
+    }
+
+    val percent = (progress * 100).toInt()
+    val isCompleted = progress >= 1f
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(18.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .background(
+                        color = NcBackgroundColor,
+                        shape = RoundedCornerShape(50)
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(progress)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    NcThirdAccentColor,
+                                    NcSecondAccentColor
+                                )
+                            ),
+                            shape = RoundedCornerShape(50)
+                        )
+                )
+            }
+
+//            if (isCompleted) {
+//                Row(
+//                    modifier = Modifier.align(Alignment.Center),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    Box(
+////                        modifier = Modifier
+////                            .background(color = Color(0xFF282735))
+////                            .padding(horizontal = 4.dp)
+//                    ) {
+//                        Text(
+//                            text = "COMPLETED",
+//                            color = NcAccentColor,
+//                            style = DefaultAppTextStyles.bebasBook14.copy(
+//                                shadow = Shadow(
+//                                    color = NcBackgroundColor,
+//                                    offset = Offset(0f, 0f),
+//                                    blurRadius = 0f
+//                                )
+//                            ),
+//
+//                            modifier = Modifier
+//                                .offset(y = 1.dp)
+//                        )
+//                    }
+//                }
+//            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = "$percent%",
+            color = NcAccentColor,
+            style = DefaultAppTextStyles.bebasBook14
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }

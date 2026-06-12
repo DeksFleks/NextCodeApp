@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,9 +24,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import dbataev.nextcodeapp.R
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,7 +153,7 @@ fun NextCodeCourseButton(
                 contentDescription = item.contentDescription,
                 tint = NcAccentColor,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(26.dp)
             )
         }
     }
@@ -195,7 +198,7 @@ fun NextCodeStreakButton(
                     painter = painterResource(item.iconRes),
                     contentDescription = item.contentDescription,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(24.dp)
                 )
             }
         }
@@ -209,7 +212,7 @@ fun NextCodeTestButton(
     modifier: Modifier = Modifier,
     onCheckedChange: (Boolean) -> Unit,
     onClick: () -> Unit
-){
+) {
     Box(
         modifier = modifier
             .fillMaxWidth(0.90f)
@@ -273,7 +276,7 @@ fun NextCodeLessonButton(
                 else NcLessonBlockedColor,
                 shape = RoundedCornerShape(15.dp)
             )
-            // .drawBehind()
+        // .drawBehind()
     ) {
         Button(
             modifier = modifier
@@ -315,13 +318,13 @@ fun NextCodeSettingButton(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = NcSecondColor.copy(alpha = 0f)),
-    ){
+    ) {
         Icon(
             painter = painterResource(R.drawable.ic_settings),
             contentDescription = null,
             tint = NcAccentColor,
             modifier = Modifier
-                .size(28.dp)
+                .size(32.dp)
         )
     }
 }
@@ -348,6 +351,34 @@ fun NextCodeBackButton(
                 .size(28.dp)
                 .rotate(90f)
         )
+    }
+}
+
+@Composable
+fun NextCodeCopyButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalMinimumInteractiveComponentSize provides 0.dp
+    ) {
+        Button(
+            modifier = modifier.size(36.dp),
+            onClick = onClick,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues(0.dp),
+            elevation = null
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_copy),
+                contentDescription = null,
+                tint = NcAccentColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 

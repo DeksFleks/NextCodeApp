@@ -10,7 +10,14 @@ val NcSecondColor = Color(0xFF39394B)               // Некоторые кар
 val NcAccentColor = Color(0xFFF9E5FF)               // Текст, иконки
 val NcSecondAccentColor = Color(0xFFB300FF)         // Обводка, кнопки
 val NcThirdAccentColor = Color(0xFF7200E3)          // Подсказки
-val NcCodeColor = Color(0xFF0BDC00)
+
+// Код
+
+val NcStringCodeColor = Color(0xFF0BDC00)
+val NcClassCodeColor = Color(0xFFE77024)
+val NcMethodCodeColor = Color(0xFFDDB6F2)
+val NcSecondMethodCodeColor = Color(0xFF4CC6FF)
+val NcEscapeCodeColor = Color(0xFFFFC107)
 
 // Доп цвета
 
@@ -25,4 +32,5 @@ val NcCourseBlockedColor = Color(0xFF696979)
 val NcCyanColor = Color(0xFF93A6F5)
 val NcErrorColor = Color(0xFFFA0003)
 val NcAccentColorWeak = Color(0xFFE5CAEC)
+val NcCodeCardColor = Color(0xFF252531)
 

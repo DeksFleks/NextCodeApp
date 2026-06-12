@@ -16,10 +16,12 @@ import dbataev.nextcodeapp.core.designsystem.component.NcBackgroundText
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeAchievementCard
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import androidx.compose.runtime.LaunchedEffect
+import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 
 @Composable
 fun AchievementsScreen(
     viewModel: AchievementViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadAchievement()
@@ -44,7 +46,8 @@ fun AchievementsScreen(
             items(achievements) { achievement ->
                 NextCodeAchievementCard(
                     modifier = Modifier.fillMaxWidth(),
-                    achievement = achievement
+                    achievement = achievement,
+                    userViewModel = userViewModel
                 )
             }
         }

@@ -29,12 +29,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dbataev.nextcodeapp.R
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
-import dbataev.nextcodeapp.core.designsystem.component.parseNextCodeText
+import dbataev.nextcodeapp.core.designsystem.component.parseNextCodeInlineText
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColorWeak
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
-import dbataev.nextcodeapp.core.designsystem.theme.NcCodeColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
 
@@ -96,7 +95,7 @@ fun ExplanationBottomSheet(
                         )
 
                         Text(
-                            text = parseNextCodeText(explanation ?: "Ответ неверный. Попробуй ещё раз."),
+                            text = parseNextCodeInlineText(explanation ?: "Ответ неверный. Попробуй ещё раз."),
                             color = NcAccentColor,
                             modifier = Modifier.padding(horizontal = 2.dp)
                         )
