@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -29,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.toInt
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,7 +40,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -60,7 +57,6 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcMainColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
-import dbataev.nextcodeapp.core.designsystem.theme.NcStringCodeColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcThirdAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NextCodeTextPart
 import android.content.ClipData
@@ -72,7 +68,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import dbataev.nextcodeapp.core.data.remote.dto.UserDto
 import kotlinx.coroutines.launch
 
 @Composable
@@ -395,7 +391,7 @@ fun NextCodeAchievementCard(
                                 NcMainColor,
                                 NcSecondColor
                             )
-                        }) as List<Color>
+                        })
                 ),
                 shape = shape
             )
@@ -463,11 +459,74 @@ fun NextCodeAchievementCard(
 }
 
 @Composable
+fun NextCodeProfileAchievementCard(
+    modifier: Modifier = Modifier,
+    achievement: AchievementDto,
+) {
+    val iconRes = when (achievement.type) {
+        AchievementType.LESSONS_COMPLETED ->
+            R.drawable.ic_lesson_ach_icon
+
+        AchievementType.STREAK_DAYS ->
+            R.drawable.ic_streak
+
+        else ->
+            R.drawable.ic_course
+    }
+
+    Column(
+        modifier = modifier.width(100.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(70.dp)
+                .background(
+                    color = NcMainColor,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .border(
+                    color = NcSecondAccentColor,
+                    width = 2.dp,
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(
+                    R.drawable.ic_achievement_bg_amethyst
+                ),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize()
+            )
+
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                tint = NcAccentColor,
+                modifier = Modifier.size(38.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = achievement.title,
+            style = DefaultAppTextStyles.bebasRegular20,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            color = NcAccentColor
+        )
+    }
+}
+
+@Composable
 fun NextCodeNewAchievementCard(
     achievement: AchievementDto,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(14.dp)
 
     val bgRes = when (achievement.levelType) {
         LevelAchievementType.BRONZE ->
@@ -521,12 +580,12 @@ fun NextCodeNewAchievementCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
-                .padding(10.dp),
+                .height(82.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(75.dp),
+                modifier = Modifier.size(60.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -539,11 +598,11 @@ fun NextCodeNewAchievementCard(
                     painter = painterResource(id = iconRes),
                     contentDescription = null,
                     tint = NcAccentColor,
-                    modifier = Modifier.size(38.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             Column(
                 modifier = Modifier.weight(1f),
@@ -551,16 +610,16 @@ fun NextCodeNewAchievementCard(
             ) {
                 Text(
                     text = "Новое достижение",
-                    style = DefaultAppTextStyles.bebasRegular20,
-                    color = NcAccentColor
+                    style = DefaultAppTextStyles.bebasBook16,
+                    color = NcCourseBlockedColor
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = achievement.title,
-                    style = DefaultAppTextStyles.bebasBook16,
-                    color = NcCourseBlockedColor,
+                    style = DefaultAppTextStyles.bebasRegular20,
+                    color = NcAccentColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -600,7 +659,7 @@ fun NextCodeCodeBlock(
                 color = NcCodeCardColor,
                 shape = RoundedCornerShape(16.dp)
             )
-    //         .padding(horizontal = 4.dp, vertical = 4.dp)
+        //         .padding(horizontal = 4.dp, vertical = 4.dp)
     ) {
         Column {
             if (showHeader) {
@@ -693,7 +752,7 @@ fun NextCodeRichText(
                         showCopyButton = true,
                         modifier = Modifier
                             .fillMaxWidth()
-                    //      .padding(vertical = 8.dp)
+                        //      .padding(vertical = 8.dp)
                     )
                 }
             }
@@ -753,6 +812,7 @@ fun parseNextCodeInlineText(input: String): AnnotatedString {
         }
     }
 }
+
 fun parseNextCodeTextParts(input: String): List<NextCodeTextPart> {
     val parts = mutableListOf<NextCodeTextPart>()
 
@@ -819,4 +879,21 @@ fun parseNextCodeTextParts(input: String): List<NextCodeTextPart> {
     return parts
 }
 
+fun getAchievementProgress(achievement: AchievementDto, user: UserDto?): Int {
+    if (user == null) return 0
 
+    return when (achievement.type) {
+        AchievementType.LESSONS_COMPLETED -> user.completedLessons
+        AchievementType.XP_EARNED -> user.totalXp
+        AchievementType.LEVEL_REACHED -> user.level
+        AchievementType.STREAK_DAYS -> user.bestStreak
+        else -> 0
+    }.toInt()
+}
+
+fun isAchievementCompleted(achievement: AchievementDto, user: UserDto?): Boolean {
+    return getAchievementProgress(
+        achievement = achievement,
+        user = user
+    ) >= achievement.conditionValue
+}

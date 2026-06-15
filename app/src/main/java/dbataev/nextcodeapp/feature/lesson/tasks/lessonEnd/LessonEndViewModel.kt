@@ -7,6 +7,7 @@ import dbataev.nextcodeapp.core.data.remote.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dbataev.nextcodeapp.core.data.remote.dto.AchievementDto
 
 class LessonEndViewModel : ViewModel() {
 
@@ -18,6 +19,11 @@ class LessonEndViewModel : ViewModel() {
 
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
+
+    private val _newAchievements =
+        MutableStateFlow<List<AchievementDto>>(emptyList())
+
+    val newAchievements = _newAchievements.asStateFlow()
 
     fun lessonCompleted(lessonId: Long) {
         Log.d("LESSON_END_VM", "called, lessonId=$lessonId")
@@ -31,6 +37,8 @@ class LessonEndViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                _isCompleted.value = false
+                _newAchievements.value = emptyList()
                 _error.value = null
 
                 Log.d("LESSON_END_VM", "sending request")
@@ -43,11 +51,17 @@ class LessonEndViewModel : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
+                    _newAchievements.value = response.body().orEmpty()
                     _isCompleted.value = true
-                } else {
-                    _error.value = "Ошибка завершения урока: ${response.code()}"
-                }
 
+                    Log.d(
+                        "LESSON_END_VM",
+                        "new achievements=${_newAchievements.value.size}"
+                    )
+                } else {
+                    _error.value =
+                        "Ошибка завершения урока: ${response.code()}"
+                }
             } catch (e: Exception) {
                 Log.e("LESSON_END_VM", "request failed", e)
                 _error.value = e.message ?: "Ошибка соединения"

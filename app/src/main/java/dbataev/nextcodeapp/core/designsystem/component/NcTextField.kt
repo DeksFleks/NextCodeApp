@@ -1,23 +1,34 @@
 package dbataev.nextcodeapp.core.designsystem.component
 
-import android.R
+import dbataev.nextcodeapp.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -39,13 +50,19 @@ fun NextCodeTextField(
     errorText: String? = null
 ) {
     val shape = RoundedCornerShape(16.dp)
-    val labelText = errorText ?: placeholderText
-    val borderColor = if (errorText != null) NcErrorColor else NcSecondAccentColor
-    val labelColor = if (errorText != null) NcErrorColor else NcSecondAccentColor
+
+    var isPasswordVisible by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val borderColor = if (errorText != null) {
+        NcErrorColor
+    } else {
+        NcSecondAccentColor
+    }
 
     Box(
-        modifier = modifier
-            .height(65.dp)
+        modifier = modifier.height(65.dp)
     ) {
         Box(
             modifier = Modifier
@@ -59,37 +76,77 @@ fun NextCodeTextField(
                     color = borderColor,
                     shape = shape
                 )
-                .padding(horizontal = 15.dp),
+                .padding(start = 15.dp, end = if (isPassword) 5.dp else 15.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                visualTransformation = if (isPassword) {
-                    PasswordVisualTransformation()
-                } else {
-                    VisualTransformation.None
+                visualTransformation = when {
+                    !isPassword -> VisualTransformation.None
+                    isPasswordVisible -> VisualTransformation.None
+                    else -> PasswordVisualTransformation()
                 },
-                textStyle = DefaultAppTextStyles.bebasBook24.copy(
-                    color = NcAccentColor,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (isPassword) {
+                        KeyboardType.Password
+                    } else {
+                        KeyboardType.Text
+                    }
+                ),
+                textStyle = DefaultAppTextStyles.inputCode.copy(
+                    color = NcAccentColor
                 ),
                 cursorBrush = SolidColor(NcAccentColor),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 3.dp),
                 decorationBox = { innerTextField ->
-                    Box(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (value.isEmpty()) {
-                            Text(
-                                text = placeholderText,
-                                style = DefaultAppTextStyles.bebasBook24,
-                                color = NcAccentColor.copy(alpha = 0.45f)
-                            )
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = placeholderText,
+                                    style = DefaultAppTextStyles.bebasBook24,
+                                    color = NcAccentColor.copy(alpha = 0.45f)
+                                )
+                            }
+
+                            innerTextField()
                         }
-                        innerTextField()
+
+                        if (isPassword) {
+                            IconButton(
+                                onClick = {
+                                    isPasswordVisible = !isPasswordVisible
+                                },
+                                modifier = Modifier.size(44.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (isPasswordVisible) {
+                                            R.drawable.ic_visibility_off
+                                        } else {
+                                            R.drawable.ic_visibility
+                                        }
+                                    ),
+                                    contentDescription = if (isPasswordVisible) {
+                                        "Скрыть пароль"
+                                    } else {
+                                        "Показать пароль"
+                                    },
+                                    tint = NcAccentColor,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        }
                     }
                 }
             )
@@ -102,9 +159,10 @@ fun NextCodeTextField(
                 color = NcAccentColor,
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(start = 9.dp)
+                    .padding(start = 15.dp)
+                    .offset(y = (-5).dp)
+                    .background(NcBackgroundColor)
                     .padding(horizontal = 6.dp)
-                    .offset(x = 0.dp, y = -5.dp)
             )
         }
     }

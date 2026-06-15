@@ -21,20 +21,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dbataev.nextcodeapp.R
+import dbataev.nextcodeapp.core.common.LevelAchievementType
 import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
+import dbataev.nextcodeapp.core.designsystem.component.NextCodeProfileAchievementCard
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeSettingButton
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeStatisticsProfileCard
+import dbataev.nextcodeapp.core.designsystem.component.isAchievementCompleted
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
+import dbataev.nextcodeapp.feature.achievements.AchievementViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    achievementViewModel: AchievementViewModel
 ) {
     val user by userViewModel.user.collectAsState()
+    val achievements = achievementViewModel.achievements
 
     Column {
         Box(
@@ -128,6 +134,24 @@ fun ProfileScreen(
                 style = DefaultAppTextStyles.bebasBold24,
                 color = NcCourseBlockedColor
             )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            achievements
+                .filter {
+                    it.levelType == LevelAchievementType.AMETHYST &&
+                            isAchievementCompleted(it, user)
+                }
+                .forEach { achievement ->
+                    NextCodeProfileAchievementCard(
+                        achievement = achievement,
+                    )
+                }
         }
     }
 }

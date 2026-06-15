@@ -23,6 +23,7 @@ import dbataev.nextcodeapp.feature.leaderboard.LeaderboardScreen
 import dbataev.nextcodeapp.feature.profile.ProfileScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import dbataev.nextcodeapp.core.common.TaskType
 import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeTopBar
@@ -77,11 +78,11 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             ?.set("tasks", remainingTasks)
 
         when (task.type) {
-            dbataev.nextcodeapp.core.common.TaskType.TEST -> {
+            TaskType.TEST -> {
                 navController.navigate("test")
             }
 
-            dbataev.nextcodeapp.core.common.TaskType.WRITE -> {
+            TaskType.WRITE -> {
                 navController.navigate("write")
             }
 
@@ -150,7 +151,10 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
             composable(Screen.Leaderboard.route) { LeaderboardScreen() }
             composable(Screen.Achievements.route) { AchievementsScreen() }
-            composable(Screen.Profile.route) { ProfileScreen(navController = navController, userViewModel = userViewModel
+            composable(Screen.Profile.route) { ProfileScreen(
+                navController = navController,
+                userViewModel = userViewModel,
+                achievementViewModel = viewModel()
             ) }
             composable(Screen.Course.route) {
                 CourseScreen(

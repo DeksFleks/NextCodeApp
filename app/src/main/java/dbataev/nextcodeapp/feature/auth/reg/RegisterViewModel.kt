@@ -101,6 +101,18 @@ class RegisterViewModel : ViewModel() {
             }
         }
 
+        if (username.length > 20) {
+            usernameError = "Логин должен содержать не более 20 символов"
+        }
+
+        if (password.length > 64) {
+            passwordError = "Пароль должен содержать не более 64 символов"
+        }
+
+        if (nickname.length > 20) {
+            nicknameError = "Никнейм должен содержать не более 20 символов"
+        }
+
 
         if (usernameError != null || passwordError != null || repeatPasswordError != null || nicknameError != null) {
             android.util.Log.d(

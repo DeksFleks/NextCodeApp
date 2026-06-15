@@ -30,6 +30,18 @@ import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
 import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import dbataev.nextcodeapp.core.designsystem.component.NextCodeNewAchievementCard
 
 @Composable
 fun LessonEndScreen(
@@ -45,8 +57,10 @@ fun LessonEndScreen(
 
     val isCompleted by viewModel.isCompleted.collectAsState()
     val error by viewModel.error.collectAsState()
+    val newAchievements by viewModel.newAchievements.collectAsState()
 
-    LaunchedEffect(lessonId) {
+
+    LaunchedEffect(Unit) {
         viewModel.lessonCompleted(lessonId)
     }
 
@@ -63,7 +77,72 @@ fun LessonEndScreen(
     ) {
         NcBackgroundText()
 
-        NcNullTopBar( modifier = Modifier )
+        val achievementsScrollState = rememberScrollState()
+
+        if (newAchievements.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .heightIn(max = 280.dp)
+                    .padding(
+                        start = 16.dp,
+                        top = 10.dp,
+                        end = 16.dp
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(achievementsScrollState)
+                        .padding(vertical = 28.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    newAchievements.forEach { achievement ->
+                        NextCodeNewAchievementCard(
+                            achievement = achievement,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                if (achievementsScrollState.canScrollBackward) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .height(42.dp)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        NcBackgroundColor,
+                                        NcBackgroundColor.copy(alpha = 0.75f),
+                                        Color.Transparent
+                                    )
+                                )
+                            )
+                    )
+                }
+
+                if (achievementsScrollState.canScrollForward) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(42.dp)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        NcBackgroundColor.copy(alpha = 0.75f),
+                                        NcBackgroundColor
+                                    )
+                                )
+                            )
+                    )
+                }
+            }
+        }
 
         Text(
             text = "Урок пройден",

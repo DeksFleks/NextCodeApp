@@ -95,12 +95,24 @@ class SettingViewModel : ViewModel() {
             return
         }
 
-        if (usernameForUpdate != null && usernameForUpdate.length < 4) {
-            usernameError = "Логин должен содержать не менее 4 символов"
+        if (usernameForUpdate != null) {
+            if (usernameForUpdate.length < 4) {
+                usernameError = "Логин должен содержать не менее 4 символов"
+            }
+
+            if (usernameForUpdate.length > 20) {
+                usernameError = "Логин не должен содержать более 20 символов"
+            }
         }
 
-        if (nicknameForUpdate != null && nicknameForUpdate.length < 4) {
-            nicknameError = "Никнейм должен содержать не менее 4 символов"
+        if (nicknameForUpdate != null) {
+            if (nicknameForUpdate.length < 4) {
+                nicknameError = "Никнейм должен содержать не менее 4 символов"
+            }
+
+            if (nicknameForUpdate.length > 20) {
+                nicknameError = "Никнейм не должен содержать более 20 символов"
+            }
         }
 
         if (passwordForUpdate != null) {
@@ -119,6 +131,15 @@ class SettingViewModel : ViewModel() {
             if (password.length < 8) {
                 passwordError = "Пароль должен содержать не менее 8 символов"
             }
+
+            if(password.length > 64) {
+                passwordError = "Пароль не должен содержать более 64 символов"
+            }
+
+            if(repeatPassword.length > 64) {
+                repeatPasswordError = "Пароль не должен содержать более 64 символов"
+            }
+
         }
 
         if (
