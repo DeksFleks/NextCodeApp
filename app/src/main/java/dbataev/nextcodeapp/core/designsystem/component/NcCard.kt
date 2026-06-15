@@ -65,10 +65,14 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcThirdAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NextCodeTextPart
 import android.content.ClipData
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 
 @Composable
@@ -459,6 +463,113 @@ fun NextCodeAchievementCard(
 }
 
 @Composable
+fun NextCodeNewAchievementCard(
+    achievement: AchievementDto,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(16.dp)
+
+    val bgRes = when (achievement.levelType) {
+        LevelAchievementType.BRONZE ->
+            R.drawable.ic_achievement_bg_bronze
+
+        LevelAchievementType.SILVER ->
+            R.drawable.ic_achievement_bg_silver
+
+        LevelAchievementType.GOLD ->
+            R.drawable.ic_achievement_bg_gold
+
+        LevelAchievementType.AMETHYST ->
+            R.drawable.ic_achievement_bg_amethyst
+    }
+
+    val iconRes = when (achievement.type) {
+        AchievementType.LESSONS_COMPLETED ->
+            R.drawable.ic_lesson_ach_icon
+
+        AchievementType.STREAK_DAYS ->
+            R.drawable.ic_streak
+
+        else ->
+            R.drawable.ic_course
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF3A344A),
+                        Color(0xFF2C2C3B),
+                        Color(0xFF1F1F2B)
+                    )
+                ),
+                shape = shape
+            )
+            .border(
+                width = 2.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        NcThirdAccentColor,
+                        Color(0xFF6A00FF)
+                    )
+                ),
+                shape = shape
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.size(75.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = bgRes),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize()
+                )
+
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = null,
+                    tint = NcAccentColor,
+                    modifier = Modifier.size(38.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Новое достижение",
+                    style = DefaultAppTextStyles.bebasRegular20,
+                    color = NcAccentColor
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = achievement.title,
+                    style = DefaultAppTextStyles.bebasBook16,
+                    color = NcCourseBlockedColor,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun NextCodeCodeBlock(
     code: String,
     modifier: Modifier = Modifier,
@@ -474,6 +585,10 @@ fun NextCodeCodeBlock(
     val codeText = remember(code, normalizedLanguage) {
         when (normalizedLanguage) {
             "java" -> ProgrammingLanguage.highlightJavaCode(code)
+            "python", "py" -> ProgrammingLanguage.highlightPythonCode(code)
+            "c#", "C#" -> ProgrammingLanguage.highlightCSharpCode(code)
+            "go", "golang" -> ProgrammingLanguage.highlightGoCode(code)
+
             else -> AnnotatedString(code)
         }
     }
@@ -565,7 +680,7 @@ fun NextCodeRichText(
                             color = NcAccentColor,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp)
+                                .padding(bottom = 2.dp)
                         )
                     }
                 }
