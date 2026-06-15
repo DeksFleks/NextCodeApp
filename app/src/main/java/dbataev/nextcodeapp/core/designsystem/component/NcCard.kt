@@ -62,12 +62,14 @@ import dbataev.nextcodeapp.core.designsystem.theme.NextCodeTextPart
 import android.content.ClipData
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import dbataev.nextcodeapp.core.data.remote.dto.UserDto
 import kotlinx.coroutines.launch
 
@@ -474,50 +476,66 @@ fun NextCodeProfileAchievementCard(
             R.drawable.ic_course
     }
 
-    Column(
-        modifier = modifier.width(100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = modifier
+            .width(120.dp)
+            .height(130.dp)
+            .background(
+                color = NcMainColor,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                color = NcSecondAccentColor,
+                width = 2.dp,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(70.dp)
-                .background(
-                    color = NcMainColor,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .border(
-                    color = NcSecondAccentColor,
-                    width = 2.dp,
-                    shape = RoundedCornerShape(16.dp)
-                ),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(
-                    R.drawable.ic_achievement_bg_amethyst
-                ),
-                contentDescription = null,
-                modifier = Modifier.matchParentSize()
-            )
+            Box(
+                modifier = Modifier.size(70.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(
+                        R.drawable.ic_achievement_bg_amethyst
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize()
+                )
 
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = NcAccentColor,
-                modifier = Modifier.size(38.dp)
-            )
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = NcAccentColor,
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(38.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Text(
+                    text = achievement.title,
+                    style = DefaultAppTextStyles.bebasBook16,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    color = NcAccentColor,
+                    lineHeight = 18.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = achievement.title,
-            style = DefaultAppTextStyles.bebasRegular20,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            color = NcAccentColor
-        )
     }
 }
 

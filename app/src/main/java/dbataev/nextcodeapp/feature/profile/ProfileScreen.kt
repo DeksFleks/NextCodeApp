@@ -2,6 +2,8 @@ package dbataev.nextcodeapp.feature.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,8 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dbataev.nextcodeapp.R
@@ -31,6 +37,7 @@ import dbataev.nextcodeapp.core.designsystem.theme.DefaultAppTextStyles
 import dbataev.nextcodeapp.core.designsystem.theme.NcAccentColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 import dbataev.nextcodeapp.core.designsystem.theme.NcCourseBlockedColor
+import dbataev.nextcodeapp.core.designsystem.theme.NcSecondAccentColor
 import dbataev.nextcodeapp.feature.achievements.AchievementViewModel
 
 @Composable
@@ -39,6 +46,10 @@ fun ProfileScreen(
     userViewModel: UserViewModel,
     achievementViewModel: AchievementViewModel
 ) {
+    LaunchedEffect(Unit) {
+        achievementViewModel.loadAchievement()
+    }
+
     val user by userViewModel.user.collectAsState()
     val achievements = achievementViewModel.achievements
 
@@ -136,22 +147,45 @@ fun ProfileScreen(
             )
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            achievements
-                .filter {
-                    it.levelType == LevelAchievementType.AMETHYST &&
-                            isAchievementCompleted(it, user)
-                }
-                .forEach { achievement ->
+        val completedAmethystAchievements = achievements.filter {
+            it.levelType == LevelAchievementType.AMETHYST &&
+                    isAchievementCompleted(it, user)
+        }
+
+        if (completedAmethystAchievements.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .padding(horizontal = 16.dp)
+                    .border(
+                        width = 2.dp,
+                        color = NcSecondAccentColor,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "У вас пока нет достижений",
+                    style = DefaultAppTextStyles.bebasRegular24,
+                    color = NcCourseBlockedColor,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                completedAmethystAchievements.forEach { achievement ->
                     NextCodeProfileAchievementCard(
-                        achievement = achievement,
+                        achievement = achievement
                     )
                 }
+            }
         }
     }
 }
