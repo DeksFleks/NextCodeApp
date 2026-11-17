@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,18 +62,21 @@ fun NextCodeButton(
     text: String,
     modifier: Modifier = Modifier,
     colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = NcSecondAccentColor),
+    enabled: Boolean = true,
     onClick: () -> Unit,
     function: () -> Unit
 ) {
     Box(
         modifier = modifier
             .width(310.dp)
-            .height(50.dp)
+            .heightIn(min = 50.dp)
     ) {
         Button(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .heightIn(min = 50.dp),
             onClick = onClick,
+            enabled = enabled,
             shape = RoundedCornerShape(10.dp),
             colors = colors,
             contentPadding = PaddingValues(10.dp)

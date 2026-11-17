@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dbataev.nextcodeapp.core.common.TaskType
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
-import dbataev.nextcodeapp.core.designsystem.component.NcTopProgressPanel
+import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeMessageCard
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
@@ -40,7 +40,7 @@ fun TheoryScreen(
         modifier = modifier.fillMaxSize()
     ) {
         Box {
-            NcTopProgressPanel()
+            NcNullTopBar(Modifier)
         }
 
         Column(

@@ -7,7 +7,11 @@ import dbataev.nextcodeapp.core.data.remote.dto.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
-class TaskAnswerViewModel : ViewModel() {
+class TaskAnswerViewModel(
+    private val check: suspend (Long, TaskAnswerDto) -> TaskResultDto = { id, answer ->
+        RetrofitClient.taskApi.check(id, answer)
+    }
+) : ViewModel() {
     var selected by mutableStateOf<Set<Long>>(emptySet())
         private set
     var input by mutableStateOf("")
@@ -18,17 +22,16 @@ class TaskAnswerViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
         private set
     private var initialized = false
-    private var completed = false
     fun initialize(task: TaskDto) {
         if (!initialized) { input = task.starterCode.orEmpty(); initialized = true }
     }
     fun toggle(id: Long, checked: Boolean, multiple: Boolean) {
-        if (loading || completed) return
+        if (loading) return
         selected = if (!checked) selected - id else if (multiple) selected + id else setOf(id)
     }
     fun dismiss() { feedback = null }
     fun submit(task: TaskDto, lessonId: Long, onComplete: () -> Unit) {
-        if (loading || completed) return
+        if (loading) return
         if (lessonId <= 0) { error = "Не удалось определить урок. Откройте его заново."; return }
         if (task.type == dbataev.nextcodeapp.core.common.TaskType.MULTIPLE_CHOICE && selected.isEmpty()) {
             error = "Выберите ответ"; return
@@ -39,8 +42,8 @@ class TaskAnswerViewModel : ViewModel() {
         loading = true; error = null
         viewModelScope.launch {
             try {
-                val result = RetrofitClient.taskApi.check(task.id, TaskAnswerDto(lessonId, selected.toList(), input))
-                if (result.correct) { completed = true; onComplete() }
+                val result = check(task.id, TaskAnswerDto(lessonId, selected.toList(), input))
+                if (result.correct) { onComplete() }
                 else feedback = result.explanation?.takeIf { it.isNotBlank() } ?: "Ответ неверный. Попробуйте ещё раз."
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { error = "Не удалось проверить ответ. Проверьте соединение и повторите." }

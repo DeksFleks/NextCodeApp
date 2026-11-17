@@ -4,9 +4,12 @@ import dbataev.nextcodeapp.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,14 +64,21 @@ fun NextCodeTextField(
         NcSecondAccentColor
     }
 
-    Box(
-        modifier = modifier.height(65.dp)
-    ) {
+    Column(modifier = modifier) {
+        if (errorText != null) {
+            Text(
+                text = errorText,
+                style = DefaultAppTextStyles.bebasBook14,
+                color = NcAccentColor,
+                modifier = Modifier.padding(start = 15.dp, bottom = 4.dp)
+            )
+        } else {
+            Spacer(Modifier.height(10.dp))
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(55.dp)
-                .align(Alignment.BottomCenter)
+                .heightIn(min = 55.dp)
                 .clip(shape)
                 .background(NcBackgroundColor)
                 .border(
@@ -76,7 +86,7 @@ fun NextCodeTextField(
                     color = borderColor,
                     shape = shape
                 )
-                .padding(start = 15.dp, end = if (isPassword) 5.dp else 15.dp),
+                .padding(start = 15.dp, end = if (isPassword) 5.dp else 15.dp, top = 8.dp, bottom = 8.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             BasicTextField(
@@ -152,19 +162,6 @@ fun NextCodeTextField(
             )
         }
 
-        if (errorText != null) {
-            Text(
-                text = errorText,
-                style = DefaultAppTextStyles.bebasBook14,
-                color = NcAccentColor,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(start = 15.dp)
-                    .offset(y = (-5).dp)
-                    .background(NcBackgroundColor)
-                    .padding(horizontal = 6.dp)
-            )
-        }
     }
 }
 

@@ -130,14 +130,7 @@ fun SettingScreen(
                     containerColor = NcErrorColor
                 ),
                 onClick = {
-                            TokenStorage(context).clearToken()
-
-                            navController.navigate(Screen.Login.route) {
-                                popUpTo(0) {
-                                    inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
+                    dbataev.nextcodeapp.core.data.remote.RetrofitClient.session.logout()
                 }
             ) { }
 

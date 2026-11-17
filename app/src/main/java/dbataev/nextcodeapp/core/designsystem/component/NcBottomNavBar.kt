@@ -42,7 +42,7 @@ fun NextCodeBottomMenu(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     items: List<BottomMenuItem> = listOf(
-        BottomMenuItem(R.drawable.ic_code, "Код"),
+        BottomMenuItem(R.drawable.ic_home_learning, "Обучение"),
         BottomMenuItem(R.drawable.ic_leaderbord, "Таблица лидеров"),
         BottomMenuItem(R.drawable.ic_code, "Компилятор"),
         BottomMenuItem(R.drawable.ic_trophy, "Достижения"),

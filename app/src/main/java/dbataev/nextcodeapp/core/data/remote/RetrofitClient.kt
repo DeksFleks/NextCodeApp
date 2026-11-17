@@ -17,14 +17,15 @@ object RetrofitClient {
     const val BASEURL = "http://192.168.0.10:8080/"     // Дом
     // const val BASEURL = "http://10.12.107.81:8080/"  // Мобильная точка доступа
     // const val BASEURL = "172.24.112.1:8080/"         // Обшага
-    private lateinit var tokenStorage: TokenStorage
+    lateinit var session: dbataev.nextcodeapp.core.data.local.SessionManager
+        private set
 
     fun init(tokenStorage: TokenStorage) {
-        this.tokenStorage = tokenStorage
+        if (!::session.isInitialized) session = dbataev.nextcodeapp.core.data.local.SessionManager(tokenStorage)
     }
 
     val client = OkHttpClient.Builder()
-        .addInterceptor(AuthInterceptor { tokenStorage.getToken() })
+        .addInterceptor(AuthInterceptor(tokenProvider = { session.token() }, onUnauthorized = { session.expire(it) }))
         .build()
 
     private val retrofit: Retrofit by lazy {

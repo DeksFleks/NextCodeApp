@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import dbataev.nextcodeapp.core.data.remote.RetrofitClient
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -58,8 +60,27 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
         mutableLongStateOf(0L)
     }
 
-    LaunchedEffect(Unit) {
-        userViewModel.loadUser()
+    var sessionExpiredNotice by rememberSaveable { mutableStateOf(false) }
+    val sessionEnd by RetrofitClient.session.ended.collectAsState()
+    LaunchedEffect(sessionEnd) {
+        val event = sessionEnd ?: return@LaunchedEffect
+        userViewModel.clearUser()
+        currentLessonId = 0L
+        sessionExpiredNotice = event.expired
+        navController.navigate(Screen.Login.route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+            launchSingleTop = true
+        }
+        RetrofitClient.session.acknowledge(event)
+    }
+
+    // Android can restore a protected destination directly after process recreation.
+    LaunchedEffect(currentRoute) {
+        if (currentRoute != null && currentRoute !in listOf(Screen.Splash.route, Screen.Login.route, Screen.Register.route)
+            && userViewModel.user.value == null) {
+            if (RetrofitClient.session.token() == null) RetrofitClient.session.logout()
+            else userViewModel.loadUser()
+        }
     }
 
     val selectedIndex = when (currentRoute) {
@@ -116,7 +137,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     onItemClick = { index ->
                         val route = when (index) {
                             // 0 -> Screen.Home.route
-                            0 -> Screen.Home.createRoute(1L)
+                            0 -> learningRoute(user?.currentCourseId)
                             1 -> Screen.Leaderboard.route
                             2 -> Screen.Compiler.route
                             3 -> Screen.Achievements.route
@@ -125,7 +146,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                         }
 
                         navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId)
+                            popUpTo(Screen.Home.route)
                             launchSingleTop = true
                         }
                     }
@@ -143,11 +164,14 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 arguments = listOf(
                     navArgument("courseId") {
                         type = NavType.LongType
-                        defaultValue = 1L
                     }
                 )
             ) { backStackEntry ->
-                val courseId = backStackEntry.arguments?.getLong("courseId") ?: 1L
+                val courseId = backStackEntry.arguments?.getLong("courseId") ?: 0L
+                if (courseId <= 0L) {
+                    LaunchedEffect(courseId) { navController.navigate(Screen.Course.route) }
+                    return@composable
+                }
                 HomeScreen(
                     courseId = courseId,
                     navController = navController
@@ -164,19 +188,17 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             composable(Screen.Course.route) {
                 CourseScreen(
                     onCourseClick = { courseId ->
-                        userViewModel.loadUser()
+                        userViewModel.selectCourse(courseId)
 
-                        navController.navigate(Screen.Home.createRoute(courseId)) {
-                            popUpTo(Screen.Course.route) {
-                                inclusive = true
-                            }
+                        navController.navigate(learningRoute(courseId)) {
+                            popUpTo(navController.graph.id) { inclusive = true }
                         }
                     }
                 )
             }
 
             composable(Screen.Splash.route) {
-                SplashScreen(navController)
+                SplashScreen(navController, userViewModel)
             }
 
             composable(Screen.Register.route) {
@@ -184,6 +206,8 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     onRegisterSuccess = {
                         Log.d("REGISTER_DEBUG", "ON SUCCESS CALLED")
 
+                        sessionExpiredNotice = false
+                        userViewModel.clearUser()
                         userViewModel.loadUser()
 
                         navController.navigate(Screen.Course.route) {
@@ -203,13 +227,12 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
             composable("login") {
                 LoginScreen(
+                    sessionExpired = sessionExpiredNotice,
                     onLoginSuccess = {
-                        userViewModel.loadUser()
-
-                        navController.navigate(Screen.Home.createRoute(1L)) {
-                            popUpTo("login") {
-                                inclusive = true
-                            }
+                        sessionExpiredNotice = false
+                        userViewModel.clearUser()
+                        navController.navigate(Screen.Splash.route) {
+                            popUpTo(navController.graph.id) { inclusive = true }
                         }
                     },
                     onRegisterClick = {
@@ -323,11 +346,14 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 Log.d("LESSON_ID_DEBUG", "lesson_end currentLessonId = $currentLessonId")
 
                 LessonEndScreen(
-                    navController = navController,
                     lessonId = currentLessonId,
                     userViewModel = userViewModel,
-                    onCompleted = {
+                    onContinue = {
                         currentLessonId = 0L
+                        navController.navigate(learningRoute(user?.currentCourseId)) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
