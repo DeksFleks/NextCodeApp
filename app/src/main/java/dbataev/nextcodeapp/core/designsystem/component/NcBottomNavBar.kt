@@ -44,6 +44,7 @@ fun NextCodeBottomMenu(
     items: List<BottomMenuItem> = listOf(
         BottomMenuItem(R.drawable.ic_code, "Код"),
         BottomMenuItem(R.drawable.ic_leaderbord, "Таблица лидеров"),
+        BottomMenuItem(R.drawable.ic_code, "Компилятор"),
         BottomMenuItem(R.drawable.ic_trophy, "Достижения"),
         BottomMenuItem(R.drawable.ic_profile, "Профиль")
     )

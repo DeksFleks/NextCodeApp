@@ -32,6 +32,7 @@ import dbataev.nextcodeapp.feature.auth.reg.RegisterScreen
 import dbataev.nextcodeapp.feature.course.CourseScreen
 import dbataev.nextcodeapp.feature.auth.SplashScreen
 import dbataev.nextcodeapp.feature.auth.log.LoginScreen
+import dbataev.nextcodeapp.feature.compiler.CompilerScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.lessonEnd.LessonEndScreen
 import dbataev.nextcodeapp.feature.lesson.tasks.test.TestScreen
 import dbataev.nextcodeapp.feature.lesson.theory.TheoryScreen
@@ -47,6 +48,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
     val shouldShowBars = currentRoute in listOf(
         Screen.Home.route,
         Screen.Leaderboard.route,
+        Screen.Compiler.route,
         Screen.Achievements.route,
         Screen.Profile.route
     )
@@ -63,8 +65,9 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
     val selectedIndex = when (currentRoute) {
         Screen.Home.route -> 0
         Screen.Leaderboard.route -> 1
-        Screen.Achievements.route -> 2
-        Screen.Profile.route -> 3
+        Screen.Compiler.route -> 2
+        Screen.Achievements.route -> 3
+        Screen.Profile.route -> 4
         else -> 0
     }
 
@@ -115,8 +118,9 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                             // 0 -> Screen.Home.route
                             0 -> Screen.Home.createRoute(1L)
                             1 -> Screen.Leaderboard.route
-                            2 -> Screen.Achievements.route
-                            3 -> Screen.Profile.route
+                            2 -> Screen.Compiler.route
+                            3 -> Screen.Achievements.route
+                            4 -> Screen.Profile.route
                             else -> Screen.Home.route
                         }
 
@@ -150,6 +154,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 )
             }
             composable(Screen.Leaderboard.route) { LeaderboardScreen() }
+            composable(Screen.Compiler.route){ CompilerScreen() }
             composable(Screen.Achievements.route) { AchievementsScreen() }
             composable(Screen.Profile.route) { ProfileScreen(
                 navController = navController,
