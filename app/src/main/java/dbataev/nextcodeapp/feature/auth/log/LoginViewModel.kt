@@ -73,7 +73,7 @@ class LoginViewModel : ViewModel() {
                     )
                 )
 
-                TokenStorage(context).saveToken(jwtDto.jwt)
+                RetrofitClient.session.saveToken(jwtDto.jwt)
 
                 onSuccess()
 

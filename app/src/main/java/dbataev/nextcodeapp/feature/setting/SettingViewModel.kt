@@ -11,6 +11,26 @@ import dbataev.nextcodeapp.core.data.remote.dto.UpdateUserDto
 import kotlinx.coroutines.launch
 
 class SettingViewModel : ViewModel() {
+    var languages by mutableStateOf<List<dbataev.nextcodeapp.core.data.remote.dto.LanguageDto>>(emptyList())
+        private set
+    var languageId by mutableStateOf<Long?>(null)
+        private set
+    var languageLoading by mutableStateOf(false)
+        private set
+    fun selectLanguage(id: Long) {
+        if (languageLoading) return
+        languageLoading = true
+        viewModelScope.launch {
+            try {
+                RetrofitClient.userApi.setLanguage(id)
+                languageId = id
+                generalError = null
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (e: Exception) { generalError = "Не удалось сохранить язык обучения" }
+            finally { languageLoading = false }
+        }
+    }
+
 
     var username by mutableStateOf("")
         private set
@@ -44,6 +64,16 @@ class SettingViewModel : ViewModel() {
 
     var isLoading by mutableStateOf(false)
         private set
+
+    init {
+        viewModelScope.launch {
+            try {
+                languages = RetrofitClient.userApi.getLanguages()
+                languageId = RetrofitClient.userApi.getCurrentUser().languageId
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (e: Exception) { generalError = "Не удалось загрузить язык обучения" }
+        }
+    }
 
     fun onUsernameChange(value: String) {
         username = value

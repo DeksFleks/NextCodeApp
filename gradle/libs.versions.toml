@@ -13,7 +13,7 @@ ui = "1.10.6"
 
 hilt = "2.51.1"
 hiltNav = "1.2.0"
-foundation = "1.12.0"
+foundation = "1.10.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

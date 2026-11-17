@@ -33,9 +33,6 @@ fun CourseScreen(
     onCourseClick: (Long) -> Unit
 ) {
     val courses = viewModel.courses
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val repo = remember { ContextRepository(context.applicationContext) }
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.loadCourses()
@@ -62,10 +59,6 @@ fun CourseScreen(
                 if (course.isActive) {
 
                     viewModel.setCurrentCourse(course.id) {
-                        coroutineScope.launch {
-                            repo.saveCourseId(course.id.toInt())
-                        }
-
                         onCourseClick(course.id)
                     }
                 }

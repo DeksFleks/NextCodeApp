@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,9 +55,20 @@ fun SettingScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
+            Text("Язык учебных материалов", color = NcAccentColor)
+            settingViewModel.languages.forEach { language ->
+                androidx.compose.material3.TextButton(
+                    enabled = !settingViewModel.languageLoading,
+                    onClick = { settingViewModel.selectLanguage(language.id) }
+                ) {
+                    Text((if (settingViewModel.languageId == language.id) "✓ " else "") + language.name)
+                }
+            }
+            settingViewModel.generalError?.let { Text(it, color = NcErrorColor) }
             Text(
                 text = "Пользователь:",
                 color = NcAccentColor,
@@ -117,14 +130,7 @@ fun SettingScreen(
                     containerColor = NcErrorColor
                 ),
                 onClick = {
-                            TokenStorage(context).clearToken()
-
-                            navController.navigate(Screen.Login.route) {
-                                popUpTo(0) {
-                                    inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
+                    dbataev.nextcodeapp.core.data.remote.RetrofitClient.session.logout()
                 }
             ) { }
 

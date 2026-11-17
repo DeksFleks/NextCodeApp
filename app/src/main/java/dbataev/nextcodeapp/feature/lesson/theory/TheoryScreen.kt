@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dbataev.nextcodeapp.core.common.TaskType
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
-import dbataev.nextcodeapp.core.designsystem.component.NcTopProgressPanel
+import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeMessageCard
 import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
@@ -40,7 +40,7 @@ fun TheoryScreen(
         modifier = modifier.fillMaxSize()
     ) {
         Box {
-            NcTopProgressPanel()
+            NcNullTopBar(Modifier)
         }
 
         Column(
@@ -50,6 +50,10 @@ fun TheoryScreen(
                 .verticalScroll(scrollState)
                 .padding(bottom = 16.dp)
         ) {
+            viewModel.error?.let { message ->
+                androidx.compose.material3.Text(message, Modifier.padding(16.dp))
+                NextCodeButton(text = "Повторить", onClick = { viewModel.loadTasks(id) }) { }
+            }
             NextCodeMessageCard(
                 text = theoryText ?: "Здесь будет текст теории"
             )
@@ -60,7 +64,7 @@ fun TheoryScreen(
             .background(NcSecondColor)
             .align(Alignment.CenterHorizontally)) {
             NextCodeButton(
-                text = buttonTexts.random(),
+                text = if (viewModel.loading) "Загрузка…" else "К заданиям",
                 onClick = {
                     val firstTask = viewModel.tasks.firstOrNull()
 
