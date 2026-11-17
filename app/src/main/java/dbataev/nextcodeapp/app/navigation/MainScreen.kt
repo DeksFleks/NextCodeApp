@@ -81,11 +81,11 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             ?.set("tasks", remainingTasks)
 
         when (task.type) {
-            TaskType.TEST -> {
+            TaskType.MULTIPLE_CHOICE -> {
                 navController.navigate("test")
             }
 
-            TaskType.WRITE -> {
+            TaskType.CODING, TaskType.FILL_BLANK -> {
                 navController.navigate("write")
             }
 
@@ -262,6 +262,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 if (task != null) {
                     TestScreen(
                         task = task,
+                        lessonId = currentLessonId,
                         onTaskComplete = {
                             val nextTask = tasks.firstOrNull()
 
@@ -296,6 +297,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                 if (task != null) {
                     WriteScreen(
                         task = task,
+                        lessonId = currentLessonId,
                         onTaskComplete = {
                             val nextTask = tasks.firstOrNull()
 

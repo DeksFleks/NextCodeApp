@@ -8,6 +8,11 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface UserApi {
+    @GET("api/languages")
+    suspend fun getLanguages(): List<dbataev.nextcodeapp.core.data.remote.dto.LanguageDto>
+    @PUT("api/users/language/{languageId}")
+    suspend fun setLanguage(@Path("languageId") languageId: Long)
+
     @GET("api/users/me")
     suspend fun getCurrentUser(): UserDto
 

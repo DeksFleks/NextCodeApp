@@ -50,6 +50,10 @@ fun TheoryScreen(
                 .verticalScroll(scrollState)
                 .padding(bottom = 16.dp)
         ) {
+            viewModel.error?.let { message ->
+                androidx.compose.material3.Text(message, Modifier.padding(16.dp))
+                NextCodeButton(text = "Повторить", onClick = { viewModel.loadTasks(id) }) { }
+            }
             NextCodeMessageCard(
                 text = theoryText ?: "Здесь будет текст теории"
             )
@@ -60,7 +64,7 @@ fun TheoryScreen(
             .background(NcSecondColor)
             .align(Alignment.CenterHorizontally)) {
             NextCodeButton(
-                text = buttonTexts.random(),
+                text = if (viewModel.loading) "Загрузка…" else "К заданиям",
                 onClick = {
                     val firstTask = viewModel.tasks.firstOrNull()
 

@@ -1,104 +1,37 @@
 package dbataev.nextcodeapp.feature.lesson.tasks.test
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
-import dbataev.nextcodeapp.core.designsystem.component.NcNullTopBar
-import dbataev.nextcodeapp.core.designsystem.component.NextCodeButton
-import dbataev.nextcodeapp.core.designsystem.component.NextCodeMessageCard
-import dbataev.nextcodeapp.core.designsystem.component.NextCodeTestButton
-import dbataev.nextcodeapp.core.designsystem.theme.NcSecondColor
-import dbataev.nextcodeapp.feature.lesson.tasks.ExplanationBottomSheet
+import dbataev.nextcodeapp.core.designsystem.component.*
+import dbataev.nextcodeapp.feature.lesson.tasks.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestScreen(
-    task: TaskDto,
-    modifier: Modifier = Modifier,
-    viewModel: TestViewModel = viewModel(),
-    onTaskComplete: () -> Unit
-) {
-    val buttonTexts = listOf("Закомитить", "Ответил", "Продолжить", "Готово")
-    val scrollState = rememberScrollState()
-    val options = task.options ?: listOf("Кажется", "Что-то", "Сломалось", ":(")
-
-    val selectedAnswers = viewModel.selectedAnswers
-    val showExplanation = viewModel.showExplanation
-
-    val correctAnswers = listOf(task.correctAnswer)
-
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Box {
-            NcNullTopBar(modifier)
-        }
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-                .padding(bottom = 16.dp)
-        ) {
-            NextCodeMessageCard(
-                text = task.question
-            )
-
-            options.forEach { option ->
-                NextCodeTestButton(
-                    text = option,
+fun TestScreen(task: TaskDto, lessonId: Long, modifier: Modifier = Modifier,
+    viewModel: TaskAnswerViewModel = viewModel(key = "task-${task.id}"), onTaskComplete: () -> Unit) {
+    Column(modifier.fillMaxSize()) {
+        NcNullTopBar(modifier)
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
+            NextCodeMessageCard(text = task.question)
+            Text(if (task.multipleSelect) "Выберите все верные ответы" else "Выберите один ответ", Modifier.padding(16.dp))
+            task.options.orEmpty().forEach { option ->
+                NextCodeTestButton(text = option.text, checked = option.id in viewModel.selected,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    checked = selectedAnswers.contains(option),
-                    onCheckedChange = { checked ->
-                        viewModel.toggleAnswer(option, checked)
-                    }
-                ) { }
+                    onCheckedChange = { viewModel.toggle(option.id, it, task.multipleSelect) }) { }
             }
+            viewModel.error?.let { Text(it, Modifier.padding(16.dp)) }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(NcSecondColor)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            NextCodeButton(
-                text = buttonTexts.random(),
-                onClick = {
-                    val isCorrect = viewModel.checkAnswer(task.correctAnswer)
-
-                    if (isCorrect) {
-                        onTaskComplete()
-                    } else {
-                        viewModel.showExplanation()
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(bottom = 12.dp, top = 12.dp)
-                    .fillMaxWidth(0.9f),
-            ) { }
-        }
+        NextCodeButton(text = if (viewModel.loading) "Проверяем…" else "Проверить",
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            onClick = { viewModel.submit(task, lessonId, onTaskComplete) }) { }
     }
-
-    if (showExplanation) {
-        ExplanationBottomSheet(
-            explanation = task.explanation,
-            onDismiss = viewModel::hideExplanation,
-            onRetryClick = viewModel::hideExplanation
-        )
+    viewModel.feedback?.let { message ->
+        ExplanationBottomSheet(explanation = message, onDismiss = viewModel::dismiss, onRetryClick = viewModel::dismiss)
     }
 }
