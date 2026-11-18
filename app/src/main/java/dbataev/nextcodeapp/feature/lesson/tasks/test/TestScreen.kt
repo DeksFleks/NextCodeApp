@@ -15,6 +15,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dbataev.nextcodeapp.core.common.parsers.highlightTaskCode
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
 import dbataev.nextcodeapp.core.designsystem.theme.*
 import dbataev.nextcodeapp.feature.lesson.tasks.*
@@ -49,8 +50,8 @@ fun TestScreen(task: TaskDto, lessonId: Long, modifier: Modifier = Modifier,
                     else RadioButton(selected = selected, onClick = null,
                         colors = RadioButtonDefaults.colors(selectedColor = NcSecondAccentColor, unselectedColor = NcAccentColorWeak))
                     Spacer(Modifier.width(12.dp))
-                    Text(option.text, color = NcAccentColor, fontFamily = CourierNew, fontSize = 16.sp,
-                        lineHeight = 23.sp, modifier = Modifier.weight(1f))
+                    Text(highlightTaskCode(option.text), style = DefaultAppTextStyles.code.copy(color = NcAccentColor),
+                        modifier = Modifier.weight(1f))
                 }
             }
         }

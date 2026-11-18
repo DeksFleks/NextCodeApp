@@ -18,7 +18,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
@@ -26,6 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dbataev.nextcodeapp.core.common.parsers.highlightTaskCode
+import dbataev.nextcodeapp.core.common.parsers.TaskCodeVisualTransformation
 import dbataev.nextcodeapp.core.common.TaskType
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
 import dbataev.nextcodeapp.core.designsystem.theme.*
@@ -58,18 +59,19 @@ private fun FillBlankCode(task: TaskDto, input: String, enabled: Boolean, onChan
     var focused by remember { mutableStateOf(false) }
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     LaunchedEffect(focused, keyboardHeight) { if (focused) visibility.bringIntoView() }
-    val codeStyle = TextStyle(fontFamily = CourierNew, color = NcAccentColor, fontSize = 18.sp, lineHeight = 28.sp)
+    val codeStyle = DefaultAppTextStyles.code.copy(color = NcAccentColor)
     val shape = RoundedCornerShape(16.dp)
     Column(Modifier.fillMaxWidth().bringIntoViewRequester(visibility).background(NcCodeCardColor, shape).border(1.dp, NcSecondColor, shape).padding(16.dp)) {
         Text("СТРОКА КОДА", color = NcAccentColorWeak, fontSize = 11.sp, letterSpacing = 1.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            if (!task.sentenceBefore.isNullOrEmpty()) Text(task.sentenceBefore, style = codeStyle)
+            if (!task.sentenceBefore.isNullOrEmpty()) Text(highlightTaskCode(task.sentenceBefore), style = codeStyle)
             BasicTextField(value = input, onValueChange = onChange, enabled = enabled, singleLine = true,
-                textStyle = codeStyle.copy(textAlign = TextAlign.Center), cursorBrush = SolidColor(NcAccentColor),
+                textStyle = codeStyle.copy(textAlign = TextAlign.Center),
+                visualTransformation = remember { TaskCodeVisualTransformation("java") }, cursorBrush = SolidColor(NcAccentColor),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done),
-                modifier = Modifier.width(((input.length.coerceAtLeast(3) * 11f * LocalDensity.current.fontScale) + 24f).coerceIn(72f, 240f).dp).testTag("blank-input").onFocusChanged { focused = it.isFocused }
+                modifier = Modifier.width(((input.length.coerceAtLeast(3) * DefaultAppTextStyles.code.fontSize.value * 0.6f * LocalDensity.current.fontScale) + 24f).coerceIn(72f, 240f).dp).testTag("blank-input").onFocusChanged { focused = it.isFocused }
                     .background(NcSecondAccentColor.copy(alpha = 0.16f), RoundedCornerShape(8.dp))
                     .border(1.dp, NcSecondAccentColor, RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 10.dp),
                 decorationBox = { field ->
@@ -78,7 +80,7 @@ private fun FillBlankCode(task: TaskDto, input: String, enabled: Boolean, onChan
                         field()
                     }
                 })
-            if (!task.sentenceAfter.isNullOrEmpty()) Text(task.sentenceAfter, style = codeStyle)
+            if (!task.sentenceAfter.isNullOrEmpty()) Text(highlightTaskCode(task.sentenceAfter), style = codeStyle)
         }
     }
 }
@@ -90,16 +92,17 @@ private fun CodingEditor(task: TaskDto, input: String, enabled: Boolean, onChang
         Row(Modifier.fillMaxWidth().background(NcMainColor, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).padding(14.dp),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("Ваш код", color = NcAccentColor, fontSize = 14.sp)
-            Text(task.programmingLanguage.orEmpty().uppercase(), color = NcAccentColorWeak, fontFamily = CourierNew, fontSize = 12.sp)
+            Text(task.programmingLanguage.orEmpty().uppercase(), style = DefaultAppTextStyles.code.copy(color = NcAccentColorWeak))
         }
         BasicTextField(value = input, onValueChange = onChange, enabled = enabled,
-            textStyle = TextStyle(fontFamily = CourierNew, color = NcAccentColor, fontSize = 17.sp, lineHeight = 26.sp),
+            textStyle = DefaultAppTextStyles.code.copy(color = NcAccentColor),
+            visualTransformation = remember(task.programmingLanguage) { TaskCodeVisualTransformation(task.programmingLanguage.orEmpty()) },
             cursorBrush = SolidColor(NcAccentColor),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = KeyboardType.Ascii),
             modifier = Modifier.fillMaxWidth().heightIn(min = 184.dp, max = 360.dp).padding(16.dp).testTag("coding-input"),
             decorationBox = { field ->
                 Box {
-                    if (input.isEmpty()) Text("Введите код…", color = NcAccentColorWeak, fontFamily = CourierNew, fontSize = 17.sp)
+                    if (input.isEmpty()) Text("Введите код…", style = DefaultAppTextStyles.code.copy(color = NcAccentColorWeak))
                     field()
                 }
             })
