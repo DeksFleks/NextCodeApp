@@ -327,10 +327,9 @@ fun NextCodeStatisticsProfileCard(
 fun NextCodeAchievementCard(
     modifier: Modifier = Modifier,
     achievement: AchievementDto,
-    userViewModel: UserViewModel
+    user: UserDto?
 ) {
     val shape = RoundedCornerShape(16.dp)
-    val user by userViewModel.user.collectAsState()
 
     var bgRes = when (achievement.levelType) {
         LevelAchievementType.BRONZE -> R.drawable.ic_achievement_bg_bronze
@@ -347,20 +346,8 @@ fun NextCodeAchievementCard(
         }
     }
 
-    val currentProgress = when (achievement.type) {
-        AchievementType.LESSONS_COMPLETED -> user?.completedLessons ?: 0
-        // AchievementType.COURSES_COMPLETED -> user?.completedCourses ?: 0
-        AchievementType.XP_EARNED -> user?.totalXp ?: 0
-        AchievementType.LEVEL_REACHED -> user?.level ?: 1
-        AchievementType.STREAK_DAYS -> user?.bestStreak ?: 0
-        // AchievementType.DAILY_COMPLETED -> user?.completedDailyTasks ?: 0
-        // AchievementType.TASKS_COMPLETED -> user?.completedTasks ?: 0
-        else -> {
-            0
-        }
-    }
-
-    val isNotCompleted = achievement.conditionValue > currentProgress.toInt()
+    val currentProgress = getAchievementProgress(achievement, user)
+    val isNotCompleted = !isAchievementCompleted(achievement, user)
 
     if (isNotCompleted) {
         bgRes = R.drawable.ic_achievement_bg_locked

@@ -15,19 +15,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dbataev.nextcodeapp.core.designsystem.component.NcBackgroundText
 import dbataev.nextcodeapp.core.designsystem.component.NextCodeAchievementCard
 import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import dbataev.nextcodeapp.core.common.viewModel.UserViewModel
 
 @Composable
 fun AchievementsScreen(
     viewModel: AchievementViewModel = viewModel(),
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadAchievement()
+        userViewModel.loadUser()
     }
 
     val achievements = viewModel.achievements
+    val user by userViewModel.user.collectAsState()
 
     Box(
         modifier = Modifier
@@ -47,7 +51,7 @@ fun AchievementsScreen(
                 NextCodeAchievementCard(
                     modifier = Modifier.fillMaxWidth(),
                     achievement = achievement,
-                    userViewModel = userViewModel
+                    user = user
                 )
             }
         }

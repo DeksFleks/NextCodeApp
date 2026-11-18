@@ -10,7 +10,9 @@ import dbataev.nextcodeapp.core.data.remote.RetrofitClient
 import dbataev.nextcodeapp.core.data.remote.dto.AchievementDto
 import kotlinx.coroutines.launch
 
-class AchievementViewModel : ViewModel() {
+class AchievementViewModel(
+    private val fetchAchievements: suspend () -> List<AchievementDto> = { RetrofitClient.achievementApi.getAllAchievements() }
+) : ViewModel() {
     var achievements by mutableStateOf<List<AchievementDto>>(emptyList())
         private set
 
@@ -19,11 +21,12 @@ class AchievementViewModel : ViewModel() {
             try {
                 Log.d("AchievementViewModel", "loadAchievement started")
 
-                val result = RetrofitClient.achievementApi.getAllAchievements()
+                val result = fetchAchievements()
 
                 Log.d("AchievementViewModel", "loadAchievement success: $result")
 
                 achievements = result
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e
             } catch (e: Exception) {
                 Log.e("AchievementViewModel", "loadAchievement failed", e)
             }
