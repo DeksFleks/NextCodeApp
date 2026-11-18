@@ -2,7 +2,7 @@ package dbataev.nextcodeapp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.*
@@ -39,6 +39,8 @@ class TaskLayoutTest {
         compose.onNodeWithTag("blank-input").performScrollTo().performTextInput("int")
         compose.saveLayoutPreview("fill-blank-small")
         val input = compose.onNodeWithTag("blank-input").fetchSemanticsNode().boundsInRoot
+        val viewport = compose.onNodeWithTag("task-scroll").fetchSemanticsNode().boundsInRoot
+        assertTrue("Focused blank must not hide under the submit footer", input.bottom <= viewport.bottom + 1f)
         val suffix = compose.onNodeWithText(" age = 18;").fetchSemanticsNode().boundsInRoot
         assertTrue("The blank and its context must share one code row", input.top < suffix.bottom && suffix.top < input.bottom)
         compose.onNodeWithTag("task-submit").assertIsDisplayed().assertIsEnabled().performClick()
@@ -80,4 +82,34 @@ class TaskLayoutTest {
         compose.saveLayoutPreview("multiple-choice-small")
         compose.onNodeWithTag("task-submit").assertIsDisplayed().assertIsEnabled()
     }
+    @Test
+    @Config(qualifiers = "w360dp-h800dp-mdpi")
+    fun allTaskTypesStayUsableInFullPortraitLayout() {
+        val blank=TaskDto(10,TaskType.FILL_BLANK,"Укажи тип целочисленной переменной.",null,sentenceAfter=" age = 18;")
+        val coding=TaskDto(11,TaskType.CODING,"Напиши строку в точности: int age = 18;",null,starterCode="int age = ;",programmingLanguage="java")
+        val choice=TaskDto(12,TaskType.MULTIPLE_CHOICE,"Выбери ОБА корректных объявления переменных.",
+            listOf(TaskOptionDto(1,"int age = 18;"),TaskOptionDto(2,"String name = \"Deks\";"),TaskOptionDto(3,"int 2age = 18;")),multipleSelect=true)
+        val current=mutableStateOf(blank)
+        compose.setContent {
+            val task=current.value
+            key(task.id) {
+                val vm=remember { TaskAnswerViewModel { _, _ -> TaskResultDto(true,null,"test") } }
+                if (task.type==TaskType.MULTIPLE_CHOICE) TestScreen(task,8,viewModel=vm,onBack={},onTaskComplete={})
+                else WriteScreen(task,8,viewModel=vm,onBack={},onTaskComplete={})
+            }
+        }
+        compose.onNodeWithTag("blank-input").performTextInput("int")
+        compose.onNodeWithTag("task-submit").assertIsDisplayed().assertIsEnabled()
+        compose.saveLayoutPreview("fill-blank-portrait")
+        compose.runOnIdle { current.value=coding }
+        compose.onNodeWithTag("coding-input").assertIsDisplayed().assertTextEquals("int age = ;")
+        compose.onNodeWithTag("task-submit").assertIsDisplayed()
+        compose.saveLayoutPreview("coding-portrait")
+        compose.runOnIdle { current.value=choice }
+        compose.onNodeWithText("int age = 18;").performClick()
+        compose.onNodeWithText("String name = \"Deks\";").performClick()
+        compose.onNodeWithTag("task-submit").assertIsDisplayed().assertIsEnabled()
+        compose.saveLayoutPreview("multiple-choice-portrait")
+    }
+
 }

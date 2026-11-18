@@ -1,5 +1,7 @@
 package dbataev.nextcodeapp.feature.lesson.tasks.write
 
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -12,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -51,9 +54,13 @@ fun WriteScreen(task: TaskDto, lessonId: Long, modifier: Modifier = Modifier,
 
 @Composable
 private fun FillBlankCode(task: TaskDto, input: String, enabled: Boolean, onChange: (String) -> Unit) {
+    val visibility = remember { BringIntoViewRequester() }
+    var focused by remember { mutableStateOf(false) }
+    val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
+    LaunchedEffect(focused, keyboardHeight) { if (focused) visibility.bringIntoView() }
     val codeStyle = TextStyle(fontFamily = CourierNew, color = NcAccentColor, fontSize = 18.sp, lineHeight = 28.sp)
     val shape = RoundedCornerShape(16.dp)
-    Column(Modifier.fillMaxWidth().background(NcCodeCardColor, shape).border(1.dp, NcSecondColor, shape).padding(16.dp)) {
+    Column(Modifier.fillMaxWidth().bringIntoViewRequester(visibility).background(NcCodeCardColor, shape).border(1.dp, NcSecondColor, shape).padding(16.dp)) {
         Text("СТРОКА КОДА", color = NcAccentColorWeak, fontSize = 11.sp, letterSpacing = 1.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically) {
@@ -62,7 +69,7 @@ private fun FillBlankCode(task: TaskDto, input: String, enabled: Boolean, onChan
                 textStyle = codeStyle.copy(textAlign = TextAlign.Center), cursorBrush = SolidColor(NcAccentColor),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done),
-                modifier = Modifier.width(((input.length.coerceAtLeast(3) * 11f * LocalDensity.current.fontScale) + 24f).coerceIn(72f, 240f).dp).testTag("blank-input")
+                modifier = Modifier.width(((input.length.coerceAtLeast(3) * 11f * LocalDensity.current.fontScale) + 24f).coerceIn(72f, 240f).dp).testTag("blank-input").onFocusChanged { focused = it.isFocused }
                     .background(NcSecondAccentColor.copy(alpha = 0.16f), RoundedCornerShape(8.dp))
                     .border(1.dp, NcSecondAccentColor, RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 10.dp),
                 decorationBox = { field ->
