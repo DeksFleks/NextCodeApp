@@ -7,6 +7,9 @@ import dbataev.nextcodeapp.core.data.local.demo.DemoApi
 import dbataev.nextcodeapp.core.data.local.demo.DemoContent
 import dbataev.nextcodeapp.core.data.remote.dto.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import java.util.Calendar
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -97,6 +100,33 @@ class DemoApiTest {
         try { api.register(CreateUserDto("JUDGE", "Demo2026", "Other")); fail("Duplicate registered") } catch (e: HttpException) { assertEquals(409, e.code()) }
         session.logout()
         try { api.login(LoginUserDto("judge", "wrong")); fail("Wrong password accepted") } catch (e: HttpException) { assertEquals(401, e.code()) }
+    }
+    @Test fun concurrentCompletionAwardsOnlyOnce() = runBlocking {
+        register()
+        solve(DemoContent.lessons.first())
+        val results = List(5) { async { api.lessonCompleted(1) } }.awaitAll()
+        assertEquals(1, results.sumOf { it.body()!!.size })
+        assertEquals(25L, api.getCurrentUser().totalXp)
+        assertEquals(1L, api.getCurrentUser().completedLessons)
+    }
+    @Test fun streakTracksConsecutiveDaysAndKeepsBestAfterGap() = runBlocking {
+        register()
+        suspend fun complete(index: Int) { solve(DemoContent.lessons[index]); api.lessonCompleted(index + 1L) }
+        fun lastDay(offset: Int) {
+            val date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, offset) }
+            val value = "${date.get(Calendar.YEAR)}-${date.get(Calendar.MONTH) + 1}-${date.get(Calendar.DAY_OF_MONTH)}"
+            RuntimeEnvironment.getApplication().openOrCreateDatabase("nextcode_demo.db", 0, null).use {
+                it.execSQL("UPDATE users SET last_day=?", arrayOf(value))
+            }
+        }
+        complete(0)
+        lastDay(-1); complete(1)
+        assertEquals(2, api.getCurrentUser().streak)
+        lastDay(-1); complete(2)
+        assertEquals(3, api.getCurrentUser().streak)
+        lastDay(-3); complete(3)
+        assertEquals(1, api.getCurrentUser().streak)
+        assertEquals(3L, api.getCurrentUser().bestStreak)
     }
     @Test fun invalidSessionIsCleared() = runBlocking {
         session.saveToken("missing-token")
