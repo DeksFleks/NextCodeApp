@@ -32,7 +32,6 @@ android {
             dimension = "mode"
             applicationIdSuffix = ".demo"
             versionNameSuffix = "-demo"
-            resValue("string", "app_name", "NextCode Demo")
             buildConfigField("boolean", "OFFLINE_DEMO", "true")
         }
     }
