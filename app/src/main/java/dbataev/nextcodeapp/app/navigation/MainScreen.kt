@@ -179,7 +179,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
             }
             composable(Screen.Leaderboard.route) { LeaderboardScreen() }
             composable(Screen.Compiler.route){ CompilerScreen() }
-            composable(Screen.Achievements.route) { AchievementsScreen() }
+            composable(Screen.Achievements.route) { AchievementsScreen(userViewModel = userViewModel) }
             composable(Screen.Profile.route) { ProfileScreen(
                 navController = navController,
                 userViewModel = userViewModel,
@@ -286,6 +286,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     TestScreen(
                         task = task,
                         lessonId = currentLessonId,
+                        onBack = { navController.popBackStack() },
                         onTaskComplete = {
                             val nextTask = tasks.firstOrNull()
 
@@ -321,6 +322,7 @@ fun MainScreen(userViewModel: UserViewModel = viewModel()) {
                     WriteScreen(
                         task = task,
                         lessonId = currentLessonId,
+                        onBack = { navController.popBackStack() },
                         onTaskComplete = {
                             val nextTask = tasks.firstOrNull()
 

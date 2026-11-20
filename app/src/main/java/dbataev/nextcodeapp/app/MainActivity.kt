@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val tokenStorage = TokenStorage(applicationContext)
-        RetrofitClient.init(tokenStorage)
+        RetrofitClient.init(tokenStorage, applicationContext)
 
         setContent {
             MainScreen()

@@ -1,42 +1,110 @@
 package dbataev.nextcodeapp.feature.lesson.tasks.write
+
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dbataev.nextcodeapp.core.common.parsers.highlightTaskCode
+import dbataev.nextcodeapp.core.common.parsers.TaskCodeVisualTransformation
 import dbataev.nextcodeapp.core.common.TaskType
 import dbataev.nextcodeapp.core.data.remote.dto.TaskDto
-import dbataev.nextcodeapp.core.designsystem.component.*
+import dbataev.nextcodeapp.core.designsystem.theme.*
 import dbataev.nextcodeapp.feature.lesson.tasks.*
 
 @Composable
 fun WriteScreen(task: TaskDto, lessonId: Long, modifier: Modifier = Modifier,
-    viewModel: TaskAnswerViewModel = viewModel(key = "task-${task.id}"), onTaskComplete: () -> Unit) {
+    viewModel: TaskAnswerViewModel = viewModel(key = "task-${task.id}"), onBack: (() -> Unit)? = null,
+    onTaskComplete: () -> Unit) {
     LaunchedEffect(task.id) { viewModel.initialize(task) }
-    Column(modifier.fillMaxSize()) {
-        NcNullTopBar(modifier)
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-            NextCodeMessageCard(text = task.question)
-            if (task.type == TaskType.CODING) {
-                Text("Язык: ${task.programmingLanguage.orEmpty()}. Проверка по эталону: код должен совпадать, включая регистр и пробелы внутри. Код не запускается.", Modifier.padding(16.dp))
-            } else {
-                Text(task.sentenceBefore.orEmpty(), Modifier.padding(horizontal = 20.dp))
-            }
-            NextCodeTextFieldCode(value = viewModel.input, onValueChange = { if (!viewModel.loading) viewModel.input = it },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp).padding(20.dp),
-                placeholder = if (task.type == TaskType.FILL_BLANK) "Заполните пропуск…" else "Введите код…",
-                singleLine = false)
-            if (task.type == TaskType.FILL_BLANK) Text(task.sentenceAfter.orEmpty(), Modifier.padding(horizontal = 20.dp))
-            viewModel.error?.let { Text(it, Modifier.padding(16.dp)) }
+    val blank = task.type == TaskType.FILL_BLANK
+    TaskLayout(title = if (blank) "Пропуск в коде" else "Написание кода", question = task.question,
+        loading = viewModel.loading, canSubmit = viewModel.input.isNotBlank(), error = viewModel.error,
+        modifier = modifier, onSubmit = { viewModel.submit(task, lessonId, onTaskComplete) }, onBack = onBack) {
+        if (blank) {
+            Text("Дополните строку в выделенном поле", color = NcAccentColorWeak, fontSize = 14.sp)
+            FillBlankCode(task, viewModel.input, !viewModel.loading) { viewModel.input = it }
+        } else {
+            CodingEditor(task, viewModel.input, !viewModel.loading) { viewModel.input = it }
+            Text("Повторите строку по образцу: регистр и пробелы учитываются. Это упражнение без запуска кода.",
+                color = NcAccentColorWeak, fontSize = 13.sp, lineHeight = 19.sp)
         }
-        NextCodeButton(text = if (viewModel.loading) "Проверяем…" else "Проверить",
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            onClick = { viewModel.submit(task, lessonId, onTaskComplete) }) { }
     }
-    viewModel.feedback?.let { message ->
-        ExplanationBottomSheet(explanation = message, onDismiss = viewModel::dismiss, onRetryClick = viewModel::dismiss)
+    viewModel.feedback?.let { ExplanationBottomSheet(it, viewModel::dismiss, viewModel::dismiss) }
+}
+
+@Composable
+private fun FillBlankCode(task: TaskDto, input: String, enabled: Boolean, onChange: (String) -> Unit) {
+    val visibility = remember { BringIntoViewRequester() }
+    var focused by remember { mutableStateOf(false) }
+    val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
+    LaunchedEffect(focused, keyboardHeight) { if (focused) visibility.bringIntoView() }
+    val codeStyle = DefaultAppTextStyles.code.copy(color = NcAccentColor)
+    val shape = RoundedCornerShape(16.dp)
+    Column(Modifier.fillMaxWidth().bringIntoViewRequester(visibility).background(NcCodeCardColor, shape).border(1.dp, NcSecondColor, shape).padding(16.dp)) {
+        Text("СТРОКА КОДА", color = NcAccentColorWeak, fontSize = 11.sp, letterSpacing = 1.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 20.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            if (!task.sentenceBefore.isNullOrEmpty()) Text(highlightTaskCode(task.sentenceBefore), style = codeStyle)
+            BasicTextField(value = input, onValueChange = onChange, enabled = enabled, singleLine = true,
+                textStyle = codeStyle.copy(textAlign = TextAlign.Center),
+                visualTransformation = remember { TaskCodeVisualTransformation("java") }, cursorBrush = SolidColor(NcAccentColor),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done),
+                modifier = Modifier.width(((input.length.coerceAtLeast(3) * DefaultAppTextStyles.code.fontSize.value * 0.6f * LocalDensity.current.fontScale) + 24f).coerceIn(72f, 240f).dp).testTag("blank-input").onFocusChanged { focused = it.isFocused }
+                    .background(NcSecondAccentColor.copy(alpha = 0.16f), RoundedCornerShape(8.dp))
+                    .border(1.dp, NcSecondAccentColor, RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 10.dp),
+                decorationBox = { field ->
+                    Box(contentAlignment = Alignment.Center) {
+                        if (input.isEmpty()) Text("…", style = codeStyle.copy(color = NcAccentColorWeak))
+                        field()
+                    }
+                })
+            if (!task.sentenceAfter.isNullOrEmpty()) Text(highlightTaskCode(task.sentenceAfter), style = codeStyle)
+        }
+    }
+}
+
+@Composable
+private fun CodingEditor(task: TaskDto, input: String, enabled: Boolean, onChange: (String) -> Unit) {
+    val shape = RoundedCornerShape(16.dp)
+    Column(Modifier.fillMaxWidth().background(NcCodeCardColor, shape).border(1.dp, NcSecondColor, shape)) {
+        Row(Modifier.fillMaxWidth().background(NcMainColor, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).padding(14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("Ваш код", color = NcAccentColor, fontSize = 14.sp)
+            Text(task.programmingLanguage.orEmpty().uppercase(), style = DefaultAppTextStyles.code.copy(color = NcAccentColorWeak))
+        }
+        BasicTextField(value = input, onValueChange = onChange, enabled = enabled,
+            textStyle = DefaultAppTextStyles.code.copy(color = NcAccentColor),
+            visualTransformation = remember(task.programmingLanguage) { TaskCodeVisualTransformation(task.programmingLanguage.orEmpty()) },
+            cursorBrush = SolidColor(NcAccentColor),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = KeyboardType.Ascii),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 184.dp, max = 360.dp).padding(16.dp).testTag("coding-input"),
+            decorationBox = { field ->
+                Box {
+                    if (input.isEmpty()) Text("Введите код…", style = DefaultAppTextStyles.code.copy(color = NcAccentColorWeak))
+                    field()
+                }
+            })
     }
 }

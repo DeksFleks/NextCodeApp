@@ -13,6 +13,10 @@ import dbataev.nextcodeapp.core.designsystem.theme.NcBackgroundColor
 
 @Composable
 fun LeaderboardScreen(){
+    if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) {
+        dbataev.nextcodeapp.core.designsystem.component.FullVersionScreen("Рейтинг игроков", "Соревнования с другими игроками и общий рейтинг появятся в полной версии.")
+        return
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
