@@ -20,9 +20,16 @@ object RetrofitClient {
     lateinit var session: dbataev.nextcodeapp.core.data.local.SessionManager
         private set
 
-    fun init(tokenStorage: TokenStorage) {
+    fun init(tokenStorage: TokenStorage, context: android.content.Context? = null) {
         if (!::session.isInitialized) session = dbataev.nextcodeapp.core.data.local.SessionManager(tokenStorage)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO && !::offline.isInitialized) {
+            offline = dbataev.nextcodeapp.core.data.local.demo.DemoApi(requireNotNull(context).applicationContext, session)
+        }
     }
+
+    private lateinit var offline: dbataev.nextcodeapp.core.data.local.demo.DemoApi
+
+    private fun offlineApi(): dbataev.nextcodeapp.core.data.local.demo.DemoApi = offline
 
     val client = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor(tokenProvider = { session.token() }, onUnauthorized = { session.expire(it) }))
@@ -37,34 +44,34 @@ object RetrofitClient {
     }
 
     val quoteApi: QuoteApi by lazy {
-        retrofit.create(QuoteApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(QuoteApi::class.java)
     }
 
     val courseApi: CourseApi by lazy {
-        retrofit.create(CourseApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(CourseApi::class.java)
     }
 
     val moduleApi: ModuleApi by lazy {
-        retrofit.create(ModuleApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(ModuleApi::class.java)
     }
 
     val authApi: AuthApi by lazy {
-        retrofit.create(AuthApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(AuthApi::class.java)
     }
 
     val taskApi: TaskApi by lazy{
-        retrofit.create(TaskApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(TaskApi::class.java)
     }
 
     val userApi: UserApi by lazy {
-        retrofit.create(UserApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(UserApi::class.java)
     }
 
     val lessonApi: LessonApi by lazy {
-        retrofit.create(LessonApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(LessonApi::class.java)
     }
 
     val achievementApi: AchievementApi by lazy {
-        retrofit.create(AchievementApi::class.java)
+        if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) offlineApi() else retrofit.create(AchievementApi::class.java)
     }
 }

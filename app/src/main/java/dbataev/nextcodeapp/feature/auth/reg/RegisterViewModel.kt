@@ -135,7 +135,13 @@ class RegisterViewModel : ViewModel() {
 
                 onSuccess()
 
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
+                if (dbataev.nextcodeapp.BuildConfig.OFFLINE_DEMO) {
+                    usernameError = if (e is retrofit2.HttpException && e.code() == 409)
+                        "Этот логин уже занят на устройстве" else "Не удалось создать локальный аккаунт"
+                }
                 android.util.Log.e("REGISTER_DEBUG", "REGISTER ERROR", e)
             }
         }
